@@ -1,0 +1,22 @@
+# 本地开发环境：
+#     容器的数据卷映射到项目的 data/dev 目录下
+services:
+  mysql:
+    image: mysql:latest
+    pull_policy: missing
+    environment:
+      MYSQL_DATABASE: gonoweb
+      MYSQL_ROOT_PASSWORD: dev123
+    container_name: gono-mysql
+    hostname: mysql.gono.dev
+    restart: always
+    networks:
+      gono_net:
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../../script/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d # https://hub.docker.com/_/mysql#initializing-a-fresh-instance
+      # - ../../data/dev/mysql/conf.d:/etc/mysql/conf.d
+      - ../../data/dev/mysql/data:/var/lib/mysql
+networks:
+  gono_net:
