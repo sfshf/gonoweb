@@ -1,0 +1,21 @@
+# 验证toml文件格式的方法，使用tomlv命令行工具：
+# 安装 $ go install github.com/BurntSushi/toml/cmd/tomlv@latest
+# 使用 $ tomlv some-toml-file.toml
+name = "Gono Web"
+# app mode: dev test prod
+mode = "dev"
+
+[gin]
+
+[gin.jwt]
+signingKey = "gwt123"
+expired = 86400       # seconds
+
+[gorm]
+dryRun = false
+
+[gorm.mysql]
+dsn = "root:dev123@tcp(127.0.0.1:3306)/gonoweb?charset=utf8mb4&parseTime=True&loc=Local"
+connMaxLifetime = 3
+maxOpenConns = 10
+maxIdleConns = 10
