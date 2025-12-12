@@ -9,11 +9,26 @@ import (
 	"syscall"
 	"time"
 
+	_ "github.com/sfshf/gonoweb/doc/swag"
 	"github.com/sfshf/gonoweb/internal/app/web/ginsrv"
 	"github.com/sfshf/gonoweb/internal/config"
 	"github.com/sfshf/gonoweb/internal/repo"
 )
 
+// @title           Gono Web API
+// @version         1.0
+// @description     This is a web api server.
+// @termsOfService  http://swagger.io/terms/
+// @contact.name   sfshf
+// @contact.url    https://github.com/sfshf
+// @contact.email  Z1614789743@outlook.com
+// @license.name  MIT
+// @license.url   https://github.com/sfshf/gonoweb/blob/main/LICENSE
+// @host      localhost:8080
+// @BasePath  /api/v1
+// @securityDefinitions.basic  BasicAuth
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 	// Create context that listens for the interrupt signal from the OS.

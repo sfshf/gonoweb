@@ -11,6 +11,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	ginmw "github.com/sfshf/gonoweb/internal/app/web/ginsrv/middlewares"
 	"github.com/sfshf/gonoweb/internal/config"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func ginMode(appMode string) string {
@@ -53,6 +55,10 @@ func InitGin(ctx context.Context) (*gin.Engine, error) {
 	// set gin's default validator to global
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		Validator = v
+	}
+	// swagger documents
+	if config.AppConfig.Gin.Swagdoc {
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 	// 装配全局型中间件 -- CORS、TraceID、GZIP、NoMethod、NoRoute等
 	r.Use(

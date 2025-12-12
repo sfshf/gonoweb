@@ -62,7 +62,8 @@ type rootConfig struct {
 }
 
 type ginConfig struct {
-	Jwt struct {
+	Swagdoc bool `toml:"swagdoc"`
+	Jwt     struct {
 		SigningKey string        `toml:"signingKey"`
 		Expired    time.Duration `toml:"expired"` // seconds
 	} `toml:"jwt"`

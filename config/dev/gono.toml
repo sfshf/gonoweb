@@ -12,6 +12,7 @@ account = "root"
 password = "dev123"
 
 [gin]
+swagdoc = true
 
 [gin.jwt]
 signingKey = "gwt123"
