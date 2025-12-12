@@ -22,7 +22,7 @@ func Launch() (func(), error) {
 	opt := config.AppConfig.Gin.Casbin
 	// 1. 检查依赖项有没有加载成功
 	if repo.GormDB == nil {
-		return nil, errors.New("系统组件错误：Casbin适配器缺少核心组件")
+		return nil, errors.New("系统组件错误：初始化Casbin服务，缺少核心组件")
 	}
 	// 2. 加载casbin模型
 	m, err := casbinModel.NewModelFromFile(opt.Model)
@@ -143,11 +143,14 @@ func (a Adapter) SavePolicy(m casbinModel.Model) error {
 	db := a()
 	return db.Transaction(func(tx *gorm.DB) error {
 		// remove all old records
-		if err := tx.Unscoped().Delete(&model.TCasbinRule{}).Error; err != nil {
+		if err := tx.Unscoped().Delete(&model.TCasbinRule{}, "1=1").Error; err != nil {
 			return err
 		}
 		// insert all new records
-		return tx.Create(ms).Error
+		if len(ms) > 0 {
+			return tx.Create(ms).Error
+		}
+		return nil
 	})
 }
 

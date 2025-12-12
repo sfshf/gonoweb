@@ -13,6 +13,8 @@ import (
 	"github.com/sfshf/gonoweb/internal/app/web/ginsrv"
 	"github.com/sfshf/gonoweb/internal/config"
 	"github.com/sfshf/gonoweb/internal/repo"
+	casbin_svc "github.com/sfshf/gonoweb/internal/service/casbin"
+	user_svc "github.com/sfshf/gonoweb/internal/service/user"
 )
 
 // @title           Gono Web API
@@ -42,6 +44,19 @@ func main() {
 	if err := repo.InitGorm(ctx); err != nil {
 		log.Fatalln(err)
 	}
+	// 初始化前置服务
+	//   - 初始化root账号
+	clear, err := user_svc.Launch()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer clear()
+	//   - casbin service
+	clear, err = casbin_svc.Launch()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer clear()
 	// 初始化服务路由
 	router, err := ginsrv.InitGin(ctx)
 	if err != nil {

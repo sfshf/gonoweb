@@ -5,16 +5,48 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rs/xid"
 	"github.com/sfshf/gonoweb/internal/config"
 	. "github.com/sfshf/gonoweb/internal/model"
+	"github.com/sfshf/gonoweb/internal/repo"
 	casbin_repo "github.com/sfshf/gonoweb/internal/repo/casbin"
 	domain_repo "github.com/sfshf/gonoweb/internal/repo/domain"
 	mwa_repo "github.com/sfshf/gonoweb/internal/repo/menu_widget_api"
 	role_repo "github.com/sfshf/gonoweb/internal/repo/role"
 	user_repo "github.com/sfshf/gonoweb/internal/repo/user"
 	. "github.com/sfshf/gonoweb/internal/service"
+	"github.com/sfshf/gonoweb/internal/util/crypto"
 	jwt_util "github.com/sfshf/gonoweb/internal/util/jwt"
 )
+
+func Launch() (func(), error) {
+	root := config.AppConfig.Root
+	// 1. 检查依赖项有没有加载成功
+	if repo.GormDB == nil {
+		return nil, errors.New("系统组件错误：初始化用户服务，缺少核心组件")
+	}
+	// 2. 检查数据库中有没有root账号记录
+	user, err := user_repo.User_FirstByEmail(root.Account)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		// 没有，则新增
+		if err := repo.Create(&TUser{
+			Xid:      xid.New().String(),
+			Email:    root.Account,
+			Password: EncryptPlainPassword(root.Password),
+		}); err != nil {
+			return nil, err
+		}
+	}
+	return func() {
+	}, nil
+}
+
+func EncryptPlainPassword(plain string) string {
+	return crypto.Md5Hex(plain + config.AppConfig.Crypto.PasswordSalt)
+}
 
 type SignInData struct {
 	Token   string           `json:"token"`

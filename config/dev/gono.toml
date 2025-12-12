@@ -11,6 +11,9 @@ port = 8080
 account = "root"
 password = "dev123"
 
+[crypto]
+passwordSalt = "password_salt"
+
 [gin]
 swagdoc = true
 

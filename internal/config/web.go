@@ -40,12 +40,13 @@ func InitAppConfig(ctx context.Context, path ...string) error {
 }
 
 type appConfig struct {
-	Name string     `toml:"name"`
-	Mode appMode    `toml:"mode"`
-	Port int        `toml:"port"`
-	Root rootConfig `toml:"root"`
-	Gin  ginConfig  `toml:"gin"`
-	Gorm gormConfig `toml:"gorm"`
+	Name   string       `toml:"name"`
+	Mode   appMode      `toml:"mode"`
+	Port   int          `toml:"port"`
+	Root   rootConfig   `toml:"root"`
+	Crypto cryptoConfig `toml:"crypto"`
+	Gin    ginConfig    `toml:"gin"`
+	Gorm   gormConfig   `toml:"gorm"`
 }
 
 type appMode string
@@ -59,6 +60,10 @@ const (
 type rootConfig struct {
 	Account  string `toml:"account"`
 	Password string `toml:"password"`
+}
+
+type cryptoConfig struct {
+	PasswordSalt string `toml:"passwordSalt"`
 }
 
 type ginConfig struct {
