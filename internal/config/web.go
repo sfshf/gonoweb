@@ -42,6 +42,7 @@ func InitAppConfig(ctx context.Context, path ...string) error {
 type appConfig struct {
 	Name string     `toml:"name"`
 	Mode appMode    `toml:"mode"`
+	Port int        `toml:"port"`
 	Root rootConfig `toml:"root"`
 	Gin  ginConfig  `toml:"gin"`
 	Gorm gormConfig `toml:"gorm"`

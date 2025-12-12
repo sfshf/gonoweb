@@ -4,6 +4,8 @@
 name = "Gono Web"
 # app mode: dev test prod
 mode = "dev"
+port = 8080
+
 # root账号的初始密码
 [root]
 account = "root"
