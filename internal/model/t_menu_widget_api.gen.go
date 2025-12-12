@@ -19,8 +19,7 @@ type TMenuWidgetAPI struct {
 	UpdatedAt  time.Time      `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
 	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at" json:"deleted_at"`
 	Type       int32          `gorm:"column:type;not null" json:"type"`
-	Xid        string         `gorm:"column:xid;not null" json:"xid"`
-	Identifier string         `gorm:"column:identifier" json:"identifier"`
+	Identifier string         `gorm:"column:identifier;not null" json:"identifier"`
 	Name       string         `gorm:"column:name;not null" json:"name"`
 	Intro      string         `gorm:"column:intro" json:"intro"`
 	Icon       string         `gorm:"column:icon" json:"icon"`

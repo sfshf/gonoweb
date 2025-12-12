@@ -21,8 +21,10 @@ CREATE TABLE `t_user` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL,
   `xid` varchar(64) NOT NULL UNIQUE,
-  `name` varchar(64) NOT NULL UNIQUE,
-  `password` varchar(128) DEFAULT NULL,
+  `email` varchar(64) NOT NULL UNIQUE,
+  `nick_name` varchar(32) NULL,
+  `real_name` varchar(32) NULL,
+  `password` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -47,8 +49,7 @@ CREATE TABLE `t_menu_widget_api` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL,
   `type` tinyint NOT NULL, -- 1: 菜单；2: 控件；3: api
-  `xid` varchar(64) NOT NULL UNIQUE,
-  `identifier` varchar(256) DEFAULT NULL,
+  `identifier` varchar(256) NOT NULL UNIQUE,
   `name` varchar(64) NOT NULL UNIQUE,
   `intro` varchar(256) DEFAULT NULL,
   `icon` varchar(256) DEFAULT NULL, -- 菜单图标url
@@ -69,6 +70,12 @@ CREATE TABLE `t_domain` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- `t_casbin_rule` casbin规则表
+-- 主要是用casbin的 `RBAC with Domains` 模型
+-- ptype -> p, g
+-- 当ptype为g时：v0->user xid, v1->role xid, v2->domain xid
+-- 当ptype为p时：v0->role xid, v1->domain xid, v2->resource identifier, v3->method
+--      当resource为非API（菜单、控件）时，v3存储空字符串
+--      当resource为API时，v3存储相应的GET、POST、DELETE方法
 
 CREATE TABLE `t_casbin_rule` (
   `id` bigint NOT NULL AUTO_INCREMENT,

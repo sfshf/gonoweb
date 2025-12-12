@@ -4,6 +4,7 @@ go 1.25.5
 
 require (
 	github.com/BurntSushi/toml v1.5.0
+	github.com/casbin/casbin/v3 v3.0.0
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-contrib/gzip v1.2.5
@@ -18,9 +19,11 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
 	github.com/bytedance/sonic v1.14.2 // indirect
 	github.com/bytedance/sonic/loader v0.4.0 // indirect
+	github.com/casbin/govaluate v1.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.11 // indirect

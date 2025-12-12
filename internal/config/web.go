@@ -42,6 +42,7 @@ func InitAppConfig(ctx context.Context, path ...string) error {
 type appConfig struct {
 	Name string     `toml:"name"`
 	Mode appMode    `toml:"mode"`
+	Root rootConfig `toml:"root"`
 	Gin  ginConfig  `toml:"gin"`
 	Gorm gormConfig `toml:"gorm"`
 }
@@ -54,11 +55,24 @@ const (
 	AppMode_Prod appMode = "prod"
 )
 
+type rootConfig struct {
+	Account  string `toml:"account"`
+	Password string `toml:"password"`
+}
+
 type ginConfig struct {
 	Jwt struct {
 		SigningKey string        `toml:"signingKey"`
 		Expired    time.Duration `toml:"expired"` // seconds
 	} `toml:"jwt"`
+	Casbin struct {
+		Log              bool          `toml:"log"`
+		Model            string        `toml:"model"`
+		Enforce          bool          `toml:"enforce"`
+		AutoSave         bool          `toml:"autoSave"`
+		AutoLoad         bool          `toml:"autoLoad"`
+		AutoLoadInterval time.Duration `toml:"autoLoadInterval"`
+	} `toml:"casbin"`
 }
 
 type gormConfig struct {

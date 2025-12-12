@@ -19,7 +19,9 @@ type TUser struct {
 	UpdatedAt time.Time      `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at" json:"deleted_at"`
 	Xid       string         `gorm:"column:xid;not null" json:"xid"`
-	Name      string         `gorm:"column:name;not null" json:"name"`
+	Email     string         `gorm:"column:email;not null" json:"email"`
+	NickName  string         `gorm:"column:nick_name" json:"nick_name"`
+	RealName  string         `gorm:"column:real_name" json:"real_name"`
 	Password  string         `gorm:"column:password" json:"password"`
 }
 
