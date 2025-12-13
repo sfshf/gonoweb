@@ -1,3 +1,7 @@
+-- docker entrypoint init db 时默认的连接编码为 latin1，导致初始化插入数据编码不是utf8mb4
+SET character_set_client = utf8mb4;
+SET character_set_connection = utf8mb4;
+
 -- `t_menu_widget_api` 菜单、控件、API表 起始数据；起始菜单数据只有超级管理员设置密码后能看到
 INSERT INTO `t_menu_widget_api` (`type`, `identifier`, `name`, `intro`, `icon`) 
 VALUES (1, "/user", "user menu", "用户页", ""), -- 用户相关菜单
@@ -42,7 +46,7 @@ VALUES (1, "/user", "user menu", "用户页", ""), -- 用户相关菜单
 (2, "btn_delete_api", "delete api button", "删除API按钮", ""),
 (2, "btn_search_api", "search api button", "搜索API按钮", ""),
 
-(3, "GET /api/v1/ping", "ping", "PING接口", "域租户菜单"),  -- ping 接口
+(3, "GET /api/v1/ping", "ping", "PING接口", ""),  -- ping 接口
 
 (3, "POST /api/v1/user/visit", "user visit api", "用户首次访问时传递用户代理等信息", ""), -- 用户相关API
 (3, "POST /api/v1/user/sign-in", "user sign-in api", "用户登录", ""),
