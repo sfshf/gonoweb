@@ -2,6 +2,7 @@ package ginmw
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -19,8 +20,8 @@ const (
 func Jwt() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 1. 检查Authorization头部
-		jwtString := c.GetHeader("Authorization")
-		if jwtString == "" {
+		token := strings.TrimPrefix(c.GetHeader("Authorization"), jwt_util.BearerPrefix)
+		if token == "" {
 			c.JSON(http.StatusUnauthorized, &gono_web.Response{
 				Code: gono_web.ResponseCode_RequestError,
 				Msg:  "Authorization头部为空",
@@ -29,7 +30,7 @@ func Jwt() gin.HandlerFunc {
 			return
 		}
 		// 2. 检查用户的token是否是本人当前所在IP上使用的
-		if err := user_svc.CheckTokenWithIP(jwtString, c.ClientIP()); err != nil {
+		if err := user_svc.CheckTokenWithIP(token, c.ClientIP()); err != nil {
 			c.JSON(http.StatusUnauthorized, &gono_web.Response{
 				Code: gono_web.ResponseCode_RequestError,
 				Msg:  err.Error(),
@@ -37,7 +38,7 @@ func Jwt() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		claims, err := jwt_util.ParseToken(jwt_util.DefaultSigningMethod, config.AppConfig.Gin.Jwt.SigningKey, jwtString)
+		claims, err := jwt_util.ParseToken(jwt_util.DefaultSigningMethod, config.AppConfig.Gin.Jwt.SigningKey, token)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, &gono_web.Response{
 				Code: gono_web.ResponseCode_RequestError,
@@ -47,7 +48,7 @@ func Jwt() gin.HandlerFunc {
 			return
 		}
 		// 3. 检查jwt是否过期，如果过期，则提醒用户重新登录，后台不做续期行为
-		if claims.ExpiresAt.Add(-config.AppConfig.Gin.Jwt.Expired * time.Second).Before(time.Now()) {
+		if claims.ExpiresAt.Before(time.Now()) {
 			c.JSON(http.StatusUnauthorized, &gono_web.Response{
 				Code: gono_web.ResponseCode_JwtExpired,
 				Msg:  "登录token过期，请重新登录",

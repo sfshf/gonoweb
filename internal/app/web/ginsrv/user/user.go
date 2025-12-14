@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	gono_web "github.com/sfshf/gonoweb/internal/app/web"
@@ -17,6 +18,17 @@ type SignInReq struct {
 }
 
 // SignIn 用户登录
+// @Summary      用户登录
+// @Description  用户登录
+// @Tags         用户
+// @Accept       json
+// @Produce      json
+// @Param 		 request body SignInReq true "登录所需参数"
+// @Success      200  {object}  gono_web.Response
+// @Failure      400  {object}  gono_web.Response
+// @Failure      404  {object}  gono_web.Response
+// @Failure      500  {object}  gono_web.Response
+// @Router       /user/signIn [POST]
 func SignIn(c *gin.Context) {
 	// 检查请求入参
 	var req SignInReq
@@ -62,6 +74,37 @@ func SignIn(c *gin.Context) {
 }
 
 // SignOut 用户登出
+// @Summary      用户登出
+// @Description  用户登出
+// @Tags         用户
+// @Accept       json
+// @Produce      json
+// @Param        Authorization header string false "登录token"
+// @Success      200  {object}  gono_web.Response
+// @Failure      400  {object}  gono_web.Response
+// @Failure      404  {object}  gono_web.Response
+// @Failure      500  {object}  gono_web.Response
+// @Router       /user/signOut [POST]
 func SignOut(c *gin.Context) {
-	//
+	// 从gin.Context拿取用户信息
+	claims := ginmw.JwtClaims(c)
+	if claims == nil {
+		c.JSON(http.StatusOK, &gono_web.Response{
+			Code: gono_web.ResponseCode_OK,
+			Msg:  gono_web.ResponseMsg_OK,
+		})
+	}
+	// 拿取Authorization头部
+	token := strings.TrimPrefix(c.GetHeader("Authorization"), jwt_util.BearerPrefix)
+	if err := user_svc.SignOut(token); err != nil {
+		c.JSON(http.StatusInternalServerError, &gono_web.Response{
+			Code: gono_web.ResponseCode_InternalError,
+			Msg:  fmt.Sprintf("系统报错：%s", err.Error()),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, &gono_web.Response{
+		Code: gono_web.ResponseCode_OK,
+		Msg:  gono_web.ResponseMsg_OK,
+	})
 }

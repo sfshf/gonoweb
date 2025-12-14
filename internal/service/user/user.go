@@ -3,7 +3,6 @@ package user_svc
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/rs/xid"
 	"github.com/sfshf/gonoweb/internal/config"
@@ -26,7 +25,7 @@ func Launch() (func(), error) {
 		return nil, errors.New("系统组件错误：初始化用户服务，缺少核心组件")
 	}
 	// 2. 检查数据库中有没有root账号记录
-	user, err := user_repo.User_FirstByEmail(root.Account)
+	user, err := user_repo.User_FirstByEmail(root.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +33,7 @@ func Launch() (func(), error) {
 		// 没有，则新增
 		if err := repo.Create(&TUser{
 			Xid:      xid.New().String(),
-			Email:    root.Account,
+			Email:    root.Email,
 			Password: EncryptPlainPassword(root.Password),
 		}); err != nil {
 			return nil, err
@@ -73,7 +72,7 @@ func SignInByPassword(email, password string, userInfo ...string) (*SignInData, 
 		return nil, &SvcErr{Err: errors.New("用户密码错误")}
 	}
 	// 如果该用户是超管账号，则直接返回所有资源
-	if user.Email == config.AppConfig.Root.Account {
+	if user.Email == config.AppConfig.Root.Email {
 		return signIn_Root(user, userInfo...)
 	}
 	return signIn_NonRoot(user, userInfo...)
@@ -104,7 +103,7 @@ func signIn_Root(user *TUser, userInfo ...string) (*SignInData, *SvcErr) {
 			user.Xid,
 			"",
 			"",
-			config.AppConfig.Gin.Jwt.Expired*time.Second,
+			config.AppConfig.Gin.Jwt.Expired,
 		),
 	)
 	if err != nil {
@@ -177,7 +176,7 @@ func signIn_NonRoot(user *TUser, userInfo ...string) (*SignInData, *SvcErr) {
 					user.Xid,
 					"",
 					"",
-					config.AppConfig.Gin.Jwt.Expired*time.Second,
+					config.AppConfig.Gin.Jwt.Expired,
 				),
 			)
 			if err != nil {
@@ -247,7 +246,7 @@ func signIn_NonRoot(user *TUser, userInfo ...string) (*SignInData, *SvcErr) {
 			user.Xid,
 			domain.Xid,
 			role.Xid,
-			config.AppConfig.Gin.Jwt.Expired*time.Second,
+			config.AppConfig.Gin.Jwt.Expired,
 		),
 	)
 	if err != nil {
@@ -273,4 +272,16 @@ func signIn_NonRoot(user *TUser, userInfo ...string) (*SignInData, *SvcErr) {
 		Menus:   menus,
 		Widgets: widgets,
 	}, nil
+}
+
+func SignOut(token string) error {
+	// 找到user_agent记录
+	record, err := user_repo.UserAgent_FirstByToken(token)
+	if err != nil {
+		return err
+	}
+	if record == nil {
+		return nil
+	}
+	return user_repo.UserAgent_DeleteByToken(token)
 }

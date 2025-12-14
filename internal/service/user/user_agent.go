@@ -14,16 +14,6 @@ import (
 // 入参 userInfo -- 用户的登录信息；0->user_xid，1->token
 func UpsertUserAgent(ip, ua, tid string, userInfo ...string) error {
 	var err error
-	// 如果len(userInfo)>0，则是在登录，否则只是访客行为
-	var record *TUserAgent
-	if len(userInfo) > 0 {
-		record, err = user_repo.UserAgent_FirstDeletedByIP(ip)
-	} else {
-		record, err = user_repo.UserAgent_FirstByIP(ip)
-	}
-	if err != nil {
-		return err
-	}
 	var uxid string
 	if len(userInfo) > 0 {
 		uxid = userInfo[0]
@@ -31,6 +21,16 @@ func UpsertUserAgent(ip, ua, tid string, userInfo ...string) error {
 	var token string
 	if len(userInfo) > 1 {
 		token = userInfo[1]
+	}
+	// 如果uxid非空，则是在登录，否则只是访客行为
+	var record *TUserAgent
+	if uxid != "" {
+		record, err = user_repo.UserAgent_FirstUnscopedByXidAndIP(uxid, ip)
+	} else {
+		record, err = user_repo.UserAgent_FirstByIP(ip)
+	}
+	if err != nil {
+		return err
 	}
 	if record == nil {
 		// 新增记录
@@ -44,13 +44,12 @@ func UpsertUserAgent(ip, ua, tid string, userInfo ...string) error {
 			return err
 		}
 	} else {
-		// 如果len(userInfo)>0，则是在登录，否则只是访客行为
-		if len(userInfo) > 0 {
-			// 登录，则复用之前的记录
-			if err := user_repo.UserAgent_ReliveByIP(ip, &TUserAgent{
+		// 如果uxid非空，则是在登录，否则只是访客行为
+		if uxid != "" {
+			// 登录，则激活之前的记录
+			if err := user_repo.UserAgent_ReliveByXidAndIP(uxid, ip, &TUserAgent{
 				Ua:      ua,
 				TraceID: tid,
-				UserXid: uxid,
 				Token:   token,
 			}); err != nil {
 				return err
@@ -60,8 +59,6 @@ func UpsertUserAgent(ip, ua, tid string, userInfo ...string) error {
 			if err := user_repo.UserAgent_UpdateByIP(ip, &TUserAgent{
 				Ua:      ua,
 				TraceID: tid,
-				UserXid: uxid,
-				Token:   token,
 			}); err != nil {
 				return err
 			}

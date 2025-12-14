@@ -8,7 +8,7 @@ port = 8080
 
 # root账号的初始密码
 [root]
-account = "root"
+email = "root@gono.com"
 password = "dev123"
 
 [crypto]

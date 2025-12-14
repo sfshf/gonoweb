@@ -29,7 +29,7 @@ func LoadPubHandles_V1(rg *gin.RouterGroup) {
 	ug := rg.Group("/user")
 	{
 		ug.POST("/visit", user_handles.Visit)
-		ug.POST("/sign-in", user_handles.SignIn)
+		ug.POST("/signIn", user_handles.SignIn)
 	}
 }
 
@@ -37,6 +37,6 @@ func LoadAuthHandles_V1(rg *gin.RouterGroup) {
 	// user group
 	ug := rg.Group("/user")
 	{
-		ug.POST("/sign-out", user_handles.SignOut)
+		ug.POST("/signOut", user_handles.SignOut)
 	}
 }

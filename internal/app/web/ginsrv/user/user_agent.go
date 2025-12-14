@@ -10,7 +10,17 @@ import (
 	user_svc "github.com/sfshf/gonoweb/internal/service/user"
 )
 
-// Visit 用户首次打开页面，上报用户代理、时区、语言等信息
+// Visit 首次访问
+// @Summary      用户首次访问时信息上报
+// @Description  用户首次打开页面，上报用户代理、时区、语言等信息
+// @Tags         用户
+// @Accept       plain
+// @Produce      json
+// @Success      200  {object}  gono_web.Response
+// @Failure      400  {object}  gono_web.Response
+// @Failure      404  {object}  gono_web.Response
+// @Failure      500  {object}  gono_web.Response
+// @Router       /user/visit [POST]
 func Visit(c *gin.Context) {
 	// IP  from HTTP headers
 	ip := c.ClientIP()

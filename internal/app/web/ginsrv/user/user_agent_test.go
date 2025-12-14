@@ -9,6 +9,7 @@ import (
 	"github.com/sfshf/gonoweb/internal/app/web/ginsrv"
 	"github.com/sfshf/gonoweb/internal/config"
 	"github.com/sfshf/gonoweb/internal/repo"
+	user_svc "github.com/sfshf/gonoweb/internal/service/user"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,11 +19,18 @@ func TestVisit(t *testing.T) {
 	if err := config.InitAppConfig(ctx, "../../../../../config/dev/gono.toml"); err != nil {
 		t.Fatal(err)
 	}
-	r, err := ginsrv.InitGin(ctx)
+	if err := repo.InitGorm(ctx); err != nil {
+		t.Fatal(err)
+	}
+	// 初始化前置服务
+	//   - 初始化root账号
+	clear, err := user_svc.Launch()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := repo.InitGorm(ctx); err != nil {
+	defer clear()
+	r, err := ginsrv.InitGin(ctx)
+	if err != nil {
 		t.Fatal(err)
 	}
 	w := httptest.NewRecorder()

@@ -8,10 +8,19 @@ definitions:
       msg:
         type: string
     type: object
+  user.SignInReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - password
+    type: object
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: localhost:8080
+host: 192.168.211.128:8080
 info:
   contact:
     email: Z1614789743@outlook.com
@@ -51,7 +60,100 @@ paths:
             $ref: '#/definitions/gono_web.Response'
       summary: 测试服务路由
       tags:
-      - test
+      - 测试
+  /user/signIn:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录
+      parameters:
+      - description: 登录所需参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.SignInReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+      summary: 用户登录
+      tags:
+      - 用户
+  /user/signOut:
+    post:
+      consumes:
+      - application/json
+      description: 用户登出
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+      summary: 用户登出
+      tags:
+      - 用户
+  /user/visit:
+    post:
+      consumes:
+      - text/plain
+      description: 用户首次打开页面，上报用户代理、时区、语言等信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gono_web.Response'
+      summary: 用户首次访问时信息上报
+      tags:
+      - 用户
 securityDefinitions:
   BasicAuth:
     type: basic

@@ -36,6 +36,12 @@ func InitAppConfig(ctx context.Context, path ...string) error {
 		}
 		log.Printf("%s\n", b)
 	}
+	// 4. 设置适配性参数
+	var casbinModelFile string
+	if len(path) > 1 {
+		casbinModelFile = path[1]
+	}
+	AppConfig.Gin.Casbin.Model = casbinModelFile
 	return nil
 }
 
@@ -58,7 +64,7 @@ const (
 )
 
 type rootConfig struct {
-	Account  string `toml:"account"`
+	Email    string `toml:"email"`
 	Password string `toml:"password"`
 }
 

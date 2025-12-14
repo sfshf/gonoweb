@@ -36,12 +36,12 @@ func UserAgent_FirstByIP(ip string) (*TUserAgent, error) {
 	return &record, nil
 }
 
-func UserAgent_FirstDeletedByIP(ip string) (*TUserAgent, error) {
+func UserAgent_FirstUnscopedByXidAndIP(userXid, ip string) (*TUserAgent, error) {
 	var record TUserAgent
-	if err := repo.GormDB.
+	if err := repo.GormDB.Unscoped().
 		Table(TableNameTUserAgent).
 		Where("ip=?", ip).
-		Where("deleted_at IS NOT NULL").
+		Where("user_xid=?", userXid).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -90,11 +90,30 @@ func UserAgent_UpdateByIP(ip string, m *TUserAgent) error {
 		Updates(m).Error
 }
 
-func UserAgent_ReliveByIP(ip string, m *TUserAgent) error {
-	m.DeletedAt = gorm.DeletedAt{} // 将deleted_at置NULL
+func UserAgent_ReliveByXidAndIP(userXid, ip string, m *TUserAgent) error {
+	db := repo.GormDB
+	return db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Unscoped().
+			Table(TableNameTUserAgent).
+			Where("user_xid=?", userXid).
+			Where("ip=?", ip).
+			Updates(m).Error; err != nil {
+			return err
+		}
+		// 激活登录
+		return tx.Unscoped().
+			Table(TableNameTUserAgent).
+			Where("user_xid=?", userXid).
+			Where("ip=?", ip).
+			Update("deleted_at", gorm.DeletedAt{}).Error
+	})
+
+}
+
+// UserAgent_DeleteByToken soft delete record
+func UserAgent_DeleteByToken(token string) error {
 	return repo.GormDB.
 		Table(TableNameTUserAgent).
-		Where("ip=?", ip).
-		Where("deleted_at IS NOT NULL").
-		Updates(m).Error
+		Where("token=?", token).
+		Delete(&TUserAgent{}).Error
 }

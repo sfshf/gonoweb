@@ -26,7 +26,7 @@ import (
 // @contact.email  Z1614789743@outlook.com
 // @license.name  MIT
 // @license.url   https://github.com/sfshf/gonoweb/blob/main/LICENSE
-// @host      localhost:8080
+// @host      192.168.211.128:8080
 // @BasePath  /api/v1
 // @securityDefinitions.basic  BasicAuth
 // @externalDocs.description  OpenAPI

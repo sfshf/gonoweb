@@ -50,7 +50,7 @@ func Casbin() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if user.Email == config.AppConfig.Root.Account {
+		if user.Email == config.AppConfig.Root.Email {
 			c.Next()
 			return
 		}
