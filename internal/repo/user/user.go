@@ -39,7 +39,7 @@ func User_FirstUnscopedByEmail(email string) (*TUser, error) {
 	return &record, nil
 }
 
-func User_FirstByXID(xid string) (*TUser, error) {
+func User_FirstByXid(xid string) (*TUser, error) {
 	var record TUser
 	if err := repo.GormDB.
 		Table(TableNameTUser).

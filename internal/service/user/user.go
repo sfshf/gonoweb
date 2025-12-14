@@ -304,7 +304,7 @@ func ListUser(page, pageSize int) ([]TUser, int64, *SvcErr) {
 }
 
 func UserInfo(xid string) (*TUser, *SvcErr) {
-	user, err := user_repo.User_FirstByXID(xid)
+	user, err := user_repo.User_FirstByXid(xid)
 	if err != nil {
 		return nil, &SvcErr{Internal: true, Err: err}
 	}

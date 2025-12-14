@@ -1,13 +1,273 @@
 package role
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"net/http"
 
-func ListRole(c *gin.Context) {}
+	"github.com/gin-gonic/gin"
+	gono_web "github.com/sfshf/gonoweb/internal/app/web"
+	"github.com/sfshf/gonoweb/internal/model"
+	role_svc "github.com/sfshf/gonoweb/internal/service/role"
+)
 
-func RoleInfo(c *gin.Context) {}
+type ListRoleReq struct {
+	gono_web.Pagination
+}
 
-func AddRole(c *gin.Context) {}
+type ListRoleResp struct {
+	List  []model.TRole `json:"list"`
+	Total int64         `json:"total"`
+}
 
-func EditRole(c *gin.Context) {}
+// ListRole 获取角色列表
+// @Summary      获取角色列表
+// @Description  获取角色列表
+// @Tags         角色
+// @Accept       plain
+// @Produce      json
+// @Param        Authorization header string false "登录token"
+// @Param        request query ListRoleReq false "列表搜索条件"
+// @Success      200  {object}  ListRoleResp
+// @Failure      400  {object}  gono_web.Response
+// @Failure      404  {object}  gono_web.Response
+// @Failure      500  {object}  gono_web.Response
+// @Router       /role [GET]
+func ListRole(c *gin.Context) {
+	// 检查入参
+	var req ListRoleReq
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, &gono_web.Response{
+			Code: gono_web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
+		})
+	}
+	// 调用服务
+	list, total, svcErr := role_svc.ListRole(req.Page, req.PageSize)
+	if svcErr != nil {
+		if svcErr.Internal {
+			c.JSON(http.StatusInternalServerError, &gono_web.Response{
+				Code: gono_web.ResponseCode_InternalError,
+				Msg:  fmt.Sprintf("系统报错：%s", svcErr.Error()),
+			})
+			return
+		} else {
+			c.JSON(http.StatusBadRequest, &gono_web.Response{
+				Code: gono_web.ResponseCode_RequestError,
+				Msg:  fmt.Sprintf("获取列表失败：%s", svcErr.Error()),
+			})
+			return
+		}
+	}
+	// 返回结果
+	c.JSON(http.StatusOK, &gono_web.Response{
+		Code: gono_web.ResponseCode_OK,
+		Msg:  gono_web.ResponseMsg_OK,
+		Data: &ListRoleResp{
+			List:  list,
+			Total: total,
+		},
+	})
+}
 
-func DeleteRole(c *gin.Context) {}
+// RoleInfo 获取角色信息
+// @Summary      获取角色信息
+// @Description  获取角色信息
+// @Tags         角色
+// @Accept       plain
+// @Produce      json
+// @Param        Authorization header string false "登录token"
+// @Param        xid path string false "角色xid"
+// @Success      200  {object}  model.TRole
+// @Failure      400  {object}  gono_web.Response
+// @Failure      404  {object}  gono_web.Response
+// @Failure      500  {object}  gono_web.Response
+// @Router       /role/:xid [GET]
+func RoleInfo(c *gin.Context) {
+	// 检查入参
+	xid := c.Param("xid")
+	if xid == "" {
+		c.JSON(http.StatusBadRequest, &gono_web.Response{
+			Code: gono_web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", "角色xid为空"),
+		})
+	}
+	// 调用服务
+	result, svcErr := role_svc.RoleInfo(xid)
+	if svcErr != nil {
+		if svcErr.Internal {
+			c.JSON(http.StatusInternalServerError, &gono_web.Response{
+				Code: gono_web.ResponseCode_InternalError,
+				Msg:  fmt.Sprintf("系统报错：%s", svcErr.Error()),
+			})
+			return
+		} else {
+			c.JSON(http.StatusBadRequest, &gono_web.Response{
+				Code: gono_web.ResponseCode_RequestError,
+				Msg:  fmt.Sprintf("获取信息失败：%s", svcErr.Error()),
+			})
+			return
+		}
+	}
+	// 返回结果
+	c.JSON(http.StatusOK, &gono_web.Response{
+		Code: gono_web.ResponseCode_OK,
+		Msg:  gono_web.ResponseMsg_OK,
+		Data: result,
+	})
+}
+
+type AddRoleReq struct {
+	Name  string `json:"name" binding:"gt=0"`
+	Intro string `json:"intro" binding:"gt=0"`
+}
+
+// AddRole 新增角色
+// @Summary      新增角色
+// @Description  新增角色
+// @Tags         角色
+// @Accept       json
+// @Produce      json
+// @Param        Authorization header string false "登录token"
+// @Param        request body AddRoleReq false "角色信息"
+// @Success      200  {object}  model.TRole
+// @Failure      400  {object}  gono_web.Response
+// @Failure      404  {object}  gono_web.Response
+// @Failure      500  {object}  gono_web.Response
+// @Router       /role [POST]
+func AddRole(c *gin.Context) {
+	// 检查入参
+	var req AddRoleReq
+	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, &gono_web.Response{
+			Code: gono_web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
+		})
+	}
+	// 调用服务
+	result, svcErr := role_svc.AddRole(req.Name, req.Intro)
+	if svcErr != nil {
+		if svcErr.Internal {
+			c.JSON(http.StatusInternalServerError, &gono_web.Response{
+				Code: gono_web.ResponseCode_InternalError,
+				Msg:  fmt.Sprintf("系统报错：%s", svcErr.Error()),
+			})
+			return
+		} else {
+			c.JSON(http.StatusBadRequest, &gono_web.Response{
+				Code: gono_web.ResponseCode_RequestError,
+				Msg:  fmt.Sprintf("新增失败：%s", svcErr.Error()),
+			})
+			return
+		}
+	}
+	// 返回结果
+	c.JSON(http.StatusOK, &gono_web.Response{
+		Code: gono_web.ResponseCode_OK,
+		Msg:  gono_web.ResponseMsg_OK,
+		Data: result,
+	})
+}
+
+type EditRoleReq struct {
+	Name  string `json:"name" binding:"gt=0"`
+	Intro string `json:"intro" binding:"gt=0"`
+}
+
+// EditRole 编辑角色
+// @Summary      编辑角色
+// @Description  编辑角色
+// @Tags         角色
+// @Accept       json
+// @Produce      json
+// @Param        Authorization header string false "登录token"
+// @Param        xid path string false "角色xid"
+// @Param        request body EditRoleReq false "角色信息"
+// @Success      200  {object}  gono_web.Response
+// @Failure      400  {object}  gono_web.Response
+// @Failure      404  {object}  gono_web.Response
+// @Failure      500  {object}  gono_web.Response
+// @Router       /role/:xid [PUT]
+func EditRole(c *gin.Context) {
+	// 检查入参
+	xid := c.Param("xid")
+	if xid == "" {
+		c.JSON(http.StatusBadRequest, &gono_web.Response{
+			Code: gono_web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", "角色xid为空"),
+		})
+	}
+	var req EditRoleReq
+	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, &gono_web.Response{
+			Code: gono_web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
+		})
+	}
+	// 调用服务
+	svcErr := role_svc.EditRole(xid, req.Name, req.Intro)
+	if svcErr != nil {
+		if svcErr.Internal {
+			c.JSON(http.StatusInternalServerError, &gono_web.Response{
+				Code: gono_web.ResponseCode_InternalError,
+				Msg:  fmt.Sprintf("系统报错：%s", svcErr.Error()),
+			})
+			return
+		} else {
+			c.JSON(http.StatusBadRequest, &gono_web.Response{
+				Code: gono_web.ResponseCode_RequestError,
+				Msg:  fmt.Sprintf("更新失败：%s", svcErr.Error()),
+			})
+			return
+		}
+	}
+	// 返回结果
+	c.JSON(http.StatusOK, &gono_web.Response{
+		Code: gono_web.ResponseCode_OK,
+		Msg:  gono_web.ResponseMsg_OK,
+	})
+}
+
+// DeleteRole 删除角色
+// @Summary      删除角色
+// @Description  删除角色
+// @Tags         角色
+// @Accept       json
+// @Produce      json
+// @Param        Authorization header string false "登录token"
+// @Param        xid path string false "角色xid"
+// @Success      200  {object}  gono_web.Response
+// @Failure      400  {object}  gono_web.Response
+// @Failure      404  {object}  gono_web.Response
+// @Failure      500  {object}  gono_web.Response
+// @Router       /role/:xid [DELETE]
+func DeleteRole(c *gin.Context) {
+	// 检查入参
+	xid := c.Param("xid")
+	if xid == "" {
+		c.JSON(http.StatusBadRequest, &gono_web.Response{
+			Code: gono_web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", "角色xid为空"),
+		})
+	}
+	// 调用服务
+	if svcErr := role_svc.DeleteRole(xid); svcErr != nil {
+		if svcErr.Internal {
+			c.JSON(http.StatusInternalServerError, &gono_web.Response{
+				Code: gono_web.ResponseCode_InternalError,
+				Msg:  fmt.Sprintf("系统报错：%s", svcErr.Error()),
+			})
+			return
+		} else {
+			c.JSON(http.StatusBadRequest, &gono_web.Response{
+				Code: gono_web.ResponseCode_RequestError,
+				Msg:  fmt.Sprintf("删除失败：%s", svcErr.Error()),
+			})
+			return
+		}
+	}
+	// 返回结果
+	c.JSON(http.StatusOK, &gono_web.Response{
+		Code: gono_web.ResponseCode_OK,
+		Msg:  gono_web.ResponseMsg_OK,
+	})
+}

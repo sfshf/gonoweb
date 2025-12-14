@@ -33,7 +33,7 @@ func Casbin() gin.HandlerFunc {
 			return
 		}
 		// 3. 从数据库获取用户记录
-		user, err := user_repo.User_FirstByXID(jwtClaims.Subject)
+		user, err := user_repo.User_FirstByXid(jwtClaims.Subject)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, &gono_web.Response{
 				Code: gono_web.ResponseCode_InternalError,

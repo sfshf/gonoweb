@@ -132,6 +132,29 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  internal_app_web_ginsrv_role.AddRoleReq:
+    properties:
+      intro:
+        type: string
+      name:
+        type: string
+    type: object
+  internal_app_web_ginsrv_role.EditRoleReq:
+    properties:
+      intro:
+        type: string
+      name:
+        type: string
+    type: object
+  internal_app_web_ginsrv_role.ListRoleResp:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TRole'
+        type: array
+      total:
+        type: integer
+    type: object
   internal_app_web_ginsrv_user.AddUserReq:
     properties:
       email:
@@ -205,6 +228,193 @@ paths:
       summary: 测试服务路由
       tags:
       - 测试
+  /role:
+    get:
+      consumes:
+      - text/plain
+      description: 获取角色列表
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        maximum: 20
+        minimum: 5
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_web_ginsrv_role.ListRoleResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 获取角色列表
+      tags:
+      - 角色
+    post:
+      consumes:
+      - application/json
+      description: 新增角色
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 角色信息
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_app_web_ginsrv_role.AddRoleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TRole'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 新增角色
+      tags:
+      - 角色
+  /role/:xid:
+    delete:
+      consumes:
+      - application/json
+      description: 删除角色
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 角色xid
+        in: path
+        name: xid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 删除角色
+      tags:
+      - 角色
+    get:
+      consumes:
+      - text/plain
+      description: 获取角色信息
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 角色xid
+        in: path
+        name: xid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TRole'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 获取角色信息
+      tags:
+      - 角色
+    put:
+      consumes:
+      - application/json
+      description: 编辑角色
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 角色xid
+        in: path
+        name: xid
+        type: string
+      - description: 角色信息
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_app_web_ginsrv_role.EditRoleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 编辑角色
+      tags:
+      - 角色
   /user:
     get:
       consumes:
