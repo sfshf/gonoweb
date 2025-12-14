@@ -132,6 +132,29 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  internal_app_web_ginsrv_domain.AddDomainReq:
+    properties:
+      intro:
+        type: string
+      name:
+        type: string
+    type: object
+  internal_app_web_ginsrv_domain.EditDomainReq:
+    properties:
+      intro:
+        type: string
+      name:
+        type: string
+    type: object
+  internal_app_web_ginsrv_domain.ListDomainResp:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TDomain'
+        type: array
+      total:
+        type: integer
+    type: object
   internal_app_web_ginsrv_role.AddRoleReq:
     properties:
       intro:
@@ -213,6 +236,193 @@ info:
   title: Gono Web API
   version: "1.0"
 paths:
+  /domain:
+    get:
+      consumes:
+      - text/plain
+      description: 获取域租户列表
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        maximum: 20
+        minimum: 5
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_web_ginsrv_domain.ListDomainResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 获取域租户列表
+      tags:
+      - 域租户
+    post:
+      consumes:
+      - application/json
+      description: 新增域租户
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 域租户信息
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_app_web_ginsrv_domain.AddDomainReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TDomain'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 新增域租户
+      tags:
+      - 域租户
+  /domain/:xid:
+    delete:
+      consumes:
+      - application/json
+      description: 删除域租户
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 域租户xid
+        in: path
+        name: xid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 删除域租户
+      tags:
+      - 域租户
+    get:
+      consumes:
+      - text/plain
+      description: 获取域租户信息
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 域租户xid
+        in: path
+        name: xid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TDomain'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 获取域租户信息
+      tags:
+      - 域租户
+    put:
+      consumes:
+      - application/json
+      description: 编辑域租户
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 域租户xid
+        in: path
+        name: xid
+        type: string
+      - description: 域租户信息
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_app_web_ginsrv_domain.EditDomainReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 编辑域租户
+      tags:
+      - 域租户
   /ping:
     get:
       consumes:
