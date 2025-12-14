@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
 
-swag init -g ./cmd/gono/main.go -o ./doc/swag
+swag init \
+    -g ./cmd/gono/main.go \
+    -o ./doc/swag \
+    --parseInternal \
+    --parseDependency \
+    --parseDepth 2

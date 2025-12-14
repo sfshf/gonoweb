@@ -33,3 +33,5 @@ go.work.sum
 
 # Development directories and files
 data/dev/
+
+cmd/test/

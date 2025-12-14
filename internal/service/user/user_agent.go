@@ -7,6 +7,7 @@ import (
 	. "github.com/sfshf/gonoweb/internal/model"
 	"github.com/sfshf/gonoweb/internal/repo"
 	user_repo "github.com/sfshf/gonoweb/internal/repo/user"
+	. "github.com/sfshf/gonoweb/internal/service"
 	jwt_util "github.com/sfshf/gonoweb/internal/util/jwt"
 )
 
@@ -78,4 +79,20 @@ func CheckTokenWithIP(token, ip string) error {
 		return err
 	}
 	return nil
+}
+
+func ListUserAgent(page, pageSize int) ([]TUserAgent, int64, *SvcErr) {
+	db := repo.GormDB.Table(TableNameTUserAgent)
+	var total int64
+	if err := db.Count(&total).Error; err != nil {
+		return nil, total, &SvcErr{Internal: true, Err: err}
+	}
+	var list []TUserAgent
+	if err := db.
+		Offset((page - 1) * pageSize).
+		Limit(pageSize).
+		Find(&list).Error; err != nil {
+		return nil, total, &SvcErr{Internal: true, Err: err}
+	}
+	return list, total, nil
 }

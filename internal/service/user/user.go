@@ -6,6 +6,7 @@ import (
 
 	"github.com/rs/xid"
 	"github.com/sfshf/gonoweb/internal/config"
+	"github.com/sfshf/gonoweb/internal/model"
 	. "github.com/sfshf/gonoweb/internal/model"
 	"github.com/sfshf/gonoweb/internal/repo"
 	casbin_repo "github.com/sfshf/gonoweb/internal/repo/casbin"
@@ -31,7 +32,7 @@ func Launch() (func(), error) {
 	}
 	if user == nil {
 		// 没有，则新增
-		if err := repo.Create(&TUser{
+		if err := repo.Create(&model.TUser{
 			Xid:      xid.New().String(),
 			Email:    root.Email,
 			Password: EncryptPlainPassword(root.Password),
@@ -48,12 +49,12 @@ func EncryptPlainPassword(plain string) string {
 }
 
 type SignInData struct {
-	Token   string           `json:"token"`
-	User    *TUser           `json:"user"`
-	Domain  *TDomain         `json:"domain"`
-	Role    *TRole           `json:"role"`
-	Menus   []TMenuWidgetAPI `json:"menus"`
-	Widgets []TMenuWidgetAPI `json:"widgets"`
+	Token   string                 `json:"token"`
+	User    *model.TUser           `json:"user"`
+	Domain  *model.TDomain         `json:"domain"`
+	Role    *model.TRole           `json:"role"`
+	Menus   []model.TMenuWidgetAPI `json:"menus"`
+	Widgets []model.TMenuWidgetAPI `json:"widgets"`
 }
 
 // SignInByPassword 登录成功，则返回用户最近所在的域、角色，以及资源（菜单、控件、API）列表
@@ -79,14 +80,14 @@ func SignInByPassword(email, password string, userInfo ...string) (*SignInData, 
 }
 
 // root 账号登录，加载所有资源
-func signIn_Root(user *TUser, userInfo ...string) (*SignInData, *SvcErr) {
+func signIn_Root(user *model.TUser, userInfo ...string) (*SignInData, *SvcErr) {
 	// 获取资源
 	menuWidgets, err := mwa_repo.FindAllMenuWidgets()
 	if err != nil {
 		return nil, &SvcErr{Internal: true, Err: err}
 	}
-	var menus []TMenuWidgetAPI
-	var widgets []TMenuWidgetAPI
+	var menus []model.TMenuWidgetAPI
+	var widgets []model.TMenuWidgetAPI
 	for _, item := range menuWidgets {
 		switch item.Type {
 		case mwa_repo.MenuWidgetApiType_Menu:
@@ -134,10 +135,10 @@ func signIn_Root(user *TUser, userInfo ...string) (*SignInData, *SvcErr) {
 }
 
 // 非 root 账号登录，检查账号最近状态信息，加载相关资源
-func signIn_NonRoot(user *TUser, userInfo ...string) (*SignInData, *SvcErr) {
+func signIn_NonRoot(user *model.TUser, userInfo ...string) (*SignInData, *SvcErr) {
 	var err error
 	// 从用户最近使用的token里分析出用户最近使用的域租户和角色
-	var userAgent *TUserAgent
+	var userAgent *model.TUserAgent
 	var ip string
 	if len(userInfo) > 0 {
 		ip = userInfo[0]
@@ -228,8 +229,8 @@ func signIn_NonRoot(user *TUser, userInfo ...string) (*SignInData, *SvcErr) {
 	if err != nil {
 		return nil, &SvcErr{Internal: true, Err: err}
 	}
-	var menus []TMenuWidgetAPI
-	var widgets []TMenuWidgetAPI
+	var menus []model.TMenuWidgetAPI
+	var widgets []model.TMenuWidgetAPI
 	for _, item := range menuWidgets {
 		switch item.Type {
 		case mwa_repo.MenuWidgetApiType_Menu:
@@ -284,4 +285,79 @@ func SignOut(token string) error {
 		return nil
 	}
 	return user_repo.UserAgent_DeleteByToken(token)
+}
+
+func ListUser(page, pageSize int) ([]TUser, int64, *SvcErr) {
+	db := repo.GormDB.Table(TableNameTUser)
+	var total int64
+	if err := db.Count(&total).Error; err != nil {
+		return nil, total, &SvcErr{Internal: true, Err: err}
+	}
+	var list []TUser
+	if err := db.
+		Offset((page - 1) * pageSize).
+		Limit(pageSize).
+		Find(&list).Error; err != nil {
+		return nil, total, &SvcErr{Internal: true, Err: err}
+	}
+	return list, total, nil
+}
+
+func UserInfo(xid string) (*TUser, *SvcErr) {
+	user, err := user_repo.User_FirstByXID(xid)
+	if err != nil {
+		return nil, &SvcErr{Internal: true, Err: err}
+	}
+	if user == nil {
+		return nil, &SvcErr{Err: fmt.Errorf("用户[xid=%s]不存在", xid)}
+	}
+	return user, nil
+}
+
+func AddUser(email, password string) (*TUser, *SvcErr) {
+	// 搜索有没有重复的、删除的记录
+	user, err := user_repo.User_FirstUnscopedByEmail(email)
+	if err != nil {
+		return nil, &SvcErr{Internal: true, Err: err}
+	}
+	if user == nil {
+		// 新增
+		user := &TUser{
+			Xid:      xid.New().String(),
+			Email:    email,
+			Password: password,
+		}
+		if err := repo.Create(user); err != nil {
+			return nil, &SvcErr{Internal: true, Err: err}
+		}
+	} else {
+		// 如果是活用户则报错
+		if !user.DeletedAt.Valid {
+			return nil, &SvcErr{Err: fmt.Errorf("用户[email=%s]已存在", email)}
+		}
+		// 如果是死用户则激活
+		if err := user_repo.User_ReliveByXid(user.Xid, &TUser{
+			Password: password,
+		}); err != nil {
+			return nil, &SvcErr{Internal: true, Err: err}
+		}
+	}
+	return user, nil
+}
+
+func EditUser(xid, nickName, realName string) *SvcErr {
+	if err := user_repo.User_UpdateByXid(xid, &TUser{
+		Email:    nickName,
+		Password: realName,
+	}); err != nil {
+		return &SvcErr{Internal: true, Err: err}
+	}
+	return nil
+}
+
+func DeleteUser(xid string) *SvcErr {
+	if err := user_repo.User_DeleteByXid(xid); err != nil {
+		return &SvcErr{Internal: true, Err: err}
+	}
+	return nil
 }

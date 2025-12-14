@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  gono_web.Response:
+  github_com_sfshf_gonoweb_internal_app_web.Response:
     properties:
       code:
         type: integer
@@ -8,7 +8,163 @@ definitions:
       msg:
         type: string
     type: object
-  user.SignInReq:
+  github_com_sfshf_gonoweb_internal_model.TDomain:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      intro:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+      xid:
+        type: string
+    type: object
+  github_com_sfshf_gonoweb_internal_model.TMenuWidgetAPI:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      icon:
+        type: string
+      id:
+        type: integer
+      identifier:
+        type: string
+      intro:
+        type: string
+      name:
+        type: string
+      type:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  github_com_sfshf_gonoweb_internal_model.TRole:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      intro:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+      xid:
+        type: string
+    type: object
+  github_com_sfshf_gonoweb_internal_model.TUser:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      email:
+        type: string
+      id:
+        type: integer
+      nick_name:
+        type: string
+      password:
+        type: string
+      real_name:
+        type: string
+      updated_at:
+        type: string
+      xid:
+        type: string
+    type: object
+  github_com_sfshf_gonoweb_internal_model.TUserAgent:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      ip:
+        type: string
+      token:
+        type: string
+      trace_id:
+        type: string
+      ua:
+        type: string
+      updated_at:
+        type: string
+      user_xid:
+        type: string
+    type: object
+  github_com_sfshf_gonoweb_internal_service_user.SignInData:
+    properties:
+      domain:
+        $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TDomain'
+      menus:
+        items:
+          $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TMenuWidgetAPI'
+        type: array
+      role:
+        $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TRole'
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TUser'
+      widgets:
+        items:
+          $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TMenuWidgetAPI'
+        type: array
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  internal_app_web_ginsrv_user.AddUserReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  internal_app_web_ginsrv_user.EditUserReq:
+    properties:
+      nickName:
+        type: string
+      realName:
+        type: string
+    type: object
+  internal_app_web_ginsrv_user.ListUserAgentResp:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TUserAgent'
+        type: array
+      total:
+        type: integer
+    type: object
+  internal_app_web_ginsrv_user.ListUserResp:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TUser'
+        type: array
+      total:
+        type: integer
+    type: object
+  internal_app_web_ginsrv_user.SignInReq:
     properties:
       email:
         type: string
@@ -46,21 +202,236 @@ paths:
           description: OK
           schema:
             type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/gono_web.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/gono_web.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/gono_web.Response'
       summary: 测试服务路由
       tags:
       - 测试
+  /user:
+    get:
+      consumes:
+      - text/plain
+      description: 获取用户列表
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        maximum: 20
+        minimum: 5
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_web_ginsrv_user.ListUserResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 获取用户列表
+      tags:
+      - 用户
+    post:
+      consumes:
+      - application/json
+      description: 新增用户
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 用户信息
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_app_web_ginsrv_user.AddUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 新增用户
+      tags:
+      - 用户
+  /user/:xid:
+    delete:
+      consumes:
+      - application/json
+      description: 删除用户
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 用户xid
+        in: path
+        name: xid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 删除用户
+      tags:
+      - 用户
+    get:
+      consumes:
+      - text/plain
+      description: 获取用户信息
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 用户xid
+        in: path
+        name: xid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 获取用户信息
+      tags:
+      - 用户
+    put:
+      consumes:
+      - application/json
+      description: 编辑用户
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 用户xid
+        in: path
+        name: xid
+        type: string
+      - description: 用户信息
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_app_web_ginsrv_user.EditUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 编辑用户
+      tags:
+      - 用户
+  /user/agent:
+    get:
+      consumes:
+      - text/plain
+      description: 获取用户访问/登录记录列表
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        maximum: 20
+        minimum: 5
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_web_ginsrv_user.ListUserAgentResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 获取用户访问/登录记录列表
+      tags:
+      - 用户
   /user/signIn:
     post:
       consumes:
@@ -72,26 +443,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/user.SignInReq'
+          $ref: '#/definitions/internal_app_web_ginsrv_user.SignInReq'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_service_user.SignInData'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
       summary: 用户登录
       tags:
       - 用户
@@ -111,19 +482,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
       summary: 用户登出
       tags:
       - 用户
@@ -138,19 +509,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/gono_web.Response'
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
       summary: 用户首次访问时信息上报
       tags:
       - 用户

@@ -107,7 +107,6 @@ func UserAgent_ReliveByXidAndIP(userXid, ip string, m *TUserAgent) error {
 			Where("ip=?", ip).
 			Update("deleted_at", gorm.DeletedAt{}).Error
 	})
-
 }
 
 // UserAgent_DeleteByToken soft delete record
