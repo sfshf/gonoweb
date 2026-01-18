@@ -26,6 +26,7 @@ export type TUser = {
   nick_name: string;
   real_name: string;
   password: string;
+  avatar: string;
 };
 
 export type TDomain = {

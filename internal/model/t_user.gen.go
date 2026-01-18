@@ -23,6 +23,7 @@ type TUser struct {
 	NickName  string         `gorm:"column:nick_name" json:"nick_name"`
 	RealName  string         `gorm:"column:real_name" json:"real_name"`
 	Password  string         `gorm:"column:password" json:"password"`
+	Avatar    string         `gorm:"column:avatar" json:"avatar"`
 }
 
 // TableName TUser's table name

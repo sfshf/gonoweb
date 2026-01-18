@@ -354,8 +354,8 @@ func AddUser(email, password string) (*TUser, *SvcErr) {
 
 func EditUser(xid, nickName, realName string) *SvcErr {
 	if err := user_repo.User_UpdateByXid(xid, &TUser{
-		Email:    nickName,
-		Password: realName,
+		NickName: nickName,
+		RealName: realName,
 	}); err != nil {
 		return &SvcErr{Internal: true, Err: err}
 	}

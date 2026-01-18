@@ -25,6 +25,7 @@ CREATE TABLE `t_user` (
   `nick_name` varchar(32) NULL UNIQUE,
   `real_name` varchar(32) NULL,
   `password` varchar(64) DEFAULT NULL,
+  `avatar` varchar(256) NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { signIn } from "@/api/user";
 import { useAuthStore } from "@/zustand/user";
 import { useRouter } from "next/navigation";
+import { AuthStore } from "@/zustand/types";
 
 type SignInForm = {
   account: string;
@@ -49,7 +50,7 @@ export default function SignInPage() {
     });
   };
   // 存储用户信息 -- 当前的角色和域租户，能访问到的菜单和控件
-  const setAuth = useAuthStore((state: any) => state.setAuth);
+  const setAuth = useAuthStore((state: AuthStore) => state.setAuth);
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
@@ -76,7 +77,7 @@ export default function SignInPage() {
       });
     }
   };
-  const token = useAuthStore((state: any) => state.token);
+  const token = useAuthStore((state: AuthStore) => state.token);
   React.useEffect(() => {
     // 已登录，则回跳
     if (token) {

@@ -19,9 +19,7 @@ import React from "react";
 import { hasMenu, siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
-  TwitterIcon,
   GithubIcon,
-  DiscordIcon,
   UserCircleIcon,
   SearchIcon,
   Logo,
@@ -36,13 +34,15 @@ import {
   addToast,
 } from "@heroui/react";
 import { signOut } from "@/api/user";
-import { TMenuWidget } from "@/zustand/types";
+import { AuthStore, TMenuWidget } from "@/zustand/types";
+import { User } from "@heroui/react";
 
 export const Navbar = () => {
   const router = useRouter();
   // 检查用户登录状态
-  const token = useAuthStore((state: any) => state.token);
-  const menus = useAuthStore((state: any) => state.menus);
+  const token = useAuthStore((state: AuthStore) => state.token);
+  const user = useAuthStore((state: AuthStore) => state.user);
+  const menus = useAuthStore((state: AuthStore) => state.menus);
   React.useEffect(() => {
     // 未登录，则跳转登录页
     if (!token) {
@@ -71,7 +71,7 @@ export const Navbar = () => {
       type='search'
     />
   );
-  const clearAuth = useAuthStore((state: any) => state.clearAuth);
+  const clearAuth = useAuthStore((state: AuthStore) => state.clearAuth);
   const onPressSignOut = async () => {
     try {
       await signOut();
@@ -124,12 +124,6 @@ export const Navbar = () => {
         justify='end'
       >
         <NavbarItem className='hidden sm:flex gap-2'>
-          <Link isExternal aria-label='Twitter' href={siteConfig.links.twitter}>
-            <TwitterIcon className='text-default-500' />
-          </Link>
-          <Link isExternal aria-label='Discord' href={siteConfig.links.discord}>
-            <DiscordIcon className='text-default-500' />
-          </Link>
           <Link isExternal aria-label='Github' href={siteConfig.links.github}>
             <GithubIcon className='text-default-500' />
           </Link>
@@ -148,16 +142,16 @@ export const Navbar = () => {
               登录
             </Button>
           )}
-          {token && (
+          {token && user && (
             <Dropdown>
               <DropdownTrigger>
-                <Button
-                  className='text-sm font-normal text-default-600 bg-default-100'
-                  startContent={<UserCircleIcon className='text-blue' />}
-                  variant='flat'
-                >
-                  已登录
-                </Button>
+                <User
+                  avatarProps={{
+                    src: user.avatar,
+                  }}
+                  description={user.email}
+                  name={user.nick_name}
+                />
               </DropdownTrigger>
               <DropdownMenu aria-label='Static Actions'>
                 <DropdownItem
