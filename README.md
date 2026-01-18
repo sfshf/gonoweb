@@ -12,3 +12,4 @@ This is a monolithic Go web application scaffold that uses Gin, GORM, and Casbin
 
 - [React](https://github.com/facebook/react)
 - [Nextjs](https://nextjs.org/)
+- [HeroUI](https://www.heroui.com/docs/guide/introduction)

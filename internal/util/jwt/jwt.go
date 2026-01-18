@@ -1,6 +1,7 @@
 package util
 
 import (
+	"errors"
 	"strings"
 	"time"
 
@@ -26,6 +27,15 @@ var (
 	DefaultSigningMethod = jwt.SigningMethodHS512
 	BearerPrefix         = "Bearer "
 )
+
+type (
+	TokenExpiredError = jwt.TokenExpiredError
+)
+
+func IsTokenExpiredError(err error) bool {
+	var expErr *TokenExpiredError
+	return errors.As(err, &expErr)
+}
 
 type JwtClaims struct {
 	jwt.StandardClaims

@@ -3,7 +3,6 @@ package ginmw
 import (
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	gono_web "github.com/sfshf/gonoweb/internal/app/web"
@@ -40,19 +39,18 @@ func Jwt() gin.HandlerFunc {
 		}
 		claims, err := jwt_util.ParseToken(jwt_util.DefaultSigningMethod, config.AppConfig.Gin.Jwt.SigningKey, token)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, &gono_web.Response{
-				Code: gono_web.ResponseCode_RequestError,
-				Msg:  err.Error(),
-			})
-			c.Abort()
-			return
-		}
-		// 3. 检查jwt是否过期，如果过期，则提醒用户重新登录，后台不做续期行为
-		if claims.ExpiresAt.Before(time.Now()) {
-			c.JSON(http.StatusUnauthorized, &gono_web.Response{
-				Code: gono_web.ResponseCode_JwtExpired,
-				Msg:  "登录token过期，请重新登录",
-			})
+			// 3. 检查jwt是否过期，如果过期，则提醒用户重新登录，后台不做续期行为
+			if jwt_util.IsTokenExpiredError(err) {
+				c.JSON(http.StatusUnauthorized, &gono_web.Response{
+					Code: gono_web.ResponseCode_JwtExpired,
+					Msg:  "登录token过期，请重新登录",
+				})
+			} else {
+				c.JSON(http.StatusUnauthorized, &gono_web.Response{
+					Code: gono_web.ResponseCode_RequestError,
+					Msg:  err.Error(),
+				})
+			}
 			c.Abort()
 			return
 		}

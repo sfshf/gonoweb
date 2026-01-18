@@ -14,7 +14,7 @@ import (
 )
 
 type SignInReq struct {
-	Email    string `json:"email" binding:"email"`
+	Account  string `json:"account" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -49,7 +49,7 @@ func SignIn(c *gin.Context) {
 		tid = c.GetString(ginmw.HeaderKey_TraceID)
 	}
 	// 密码登录
-	data, svcErr := user_svc.SignInByPassword(req.Email, req.Password, ip, ua, tid)
+	data, svcErr := user_svc.SignInByPassword(req.Account, req.Password, ip, ua, tid)
 	if svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &gono_web.Response{

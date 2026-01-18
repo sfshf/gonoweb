@@ -8,6 +8,21 @@ import (
 	"gorm.io/gorm"
 )
 
+func User_FirstByNickname(nickname string) (*TUser, error) {
+	var record TUser
+	if err := repo.GormDB.
+		Table(TableNameTUser).
+		Where("nick_name=?", nickname).
+		First(&record).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		} else {
+			return nil, err
+		}
+	}
+	return &record, nil
+}
+
 func User_FirstByEmail(email string) (*TUser, error) {
 	var record TUser
 	if err := repo.GormDB.

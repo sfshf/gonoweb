@@ -3,6 +3,7 @@ package ginsrv
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
@@ -62,7 +63,13 @@ func InitGin(ctx context.Context) (*gin.Engine, error) {
 	}
 	// 装配全局型中间件 -- CORS、TraceID、GZIP、NoMethod、NoRoute等
 	r.Use(
-		cors.Default(),
+		cors.New(cors.Config{
+			AllowAllOrigins:  true,
+			AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+			AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+			AllowCredentials: false,
+			MaxAge:           12 * time.Hour,
+		}),
 		ginmw.TraceID(),
 		gzip.Gzip(gzip.DefaultCompression),
 	)

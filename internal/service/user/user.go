@@ -34,6 +34,7 @@ func Launch() (func(), error) {
 		// 没有，则新增
 		if err := repo.Create(&model.TUser{
 			Xid:      xid.New().String(),
+			NickName: "root",
 			Email:    root.Email,
 			Password: EncryptPlainPassword(root.Password),
 		}); err != nil {
@@ -59,14 +60,20 @@ type SignInData struct {
 
 // SignInByPassword 登录成功，则返回用户最近所在的域、角色，以及资源（菜单、控件、API）列表
 // 入参 userInfo -- 用户的登录信息；0->ip，1->ua，2->traceID
-func SignInByPassword(email, password string, userInfo ...string) (*SignInData, *SvcErr) {
+func SignInByPassword(account, password string, userInfo ...string) (*SignInData, *SvcErr) {
 	// 检查账号
-	user, err := user_repo.User_FirstByEmail(email)
+	user, err := user_repo.User_FirstByNickname(account)
 	if err != nil {
 		return nil, &SvcErr{Internal: true, Err: err}
 	}
 	if user == nil {
-		return nil, &SvcErr{Err: fmt.Errorf("用户账号[%s]不存在", email)}
+		user, err = user_repo.User_FirstByEmail(account)
+		if err != nil {
+			return nil, &SvcErr{Internal: true, Err: err}
+		}
+	}
+	if user == nil {
+		return nil, &SvcErr{Err: fmt.Errorf("用户账号[%s]不存在", account)}
 	}
 	// 检查密码
 	if user.Password != password {

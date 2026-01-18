@@ -22,7 +22,7 @@ CREATE TABLE `t_user` (
   `deleted_at` timestamp NULL,
   `xid` varchar(64) NOT NULL UNIQUE,
   `email` varchar(64) NOT NULL UNIQUE,
-  `nick_name` varchar(32) NULL,
+  `nick_name` varchar(32) NULL UNIQUE,
   `real_name` varchar(32) NULL,
   `password` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
