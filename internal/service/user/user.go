@@ -1,4 +1,4 @@
-package user_svc
+package user
 
 import (
 	"errors"
@@ -343,7 +343,7 @@ func AddUser(email, nickname string) (*TUser, *SvcErr) {
 		}
 	} else {
 		// 如果是活用户则报错
-		if !user.DeletedAt.Valid {
+		if user.DeletedAt == 0 {
 			return nil, &SvcErr{Err: fmt.Errorf("用户[email=%s]已存在", email)}
 		}
 		// 如果是死用户则激活

@@ -32,6 +32,7 @@ func SignIn(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
+		return
 	}
 	// IP  from HTTP headers
 	ip := c.ClientIP()
@@ -125,6 +126,7 @@ func ListUser(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
+		return
 	}
 	wheres := make(map[string][]any)
 	if req.Email != "" {
@@ -185,6 +187,7 @@ func UserInfo(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", "用户xid为空"),
 		})
+		return
 	}
 	// 调用服务
 	result, svcErr := user_svc.UserInfo(xid)
@@ -232,6 +235,7 @@ func AddUser(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
+		return
 	}
 	// 调用服务
 	result, svcErr := user_svc.AddUser(req.Email, req.Nickname)
@@ -280,6 +284,7 @@ func EditUser(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", "用户xid为空"),
 		})
+		return
 	}
 	var req EditUserReq
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
@@ -287,6 +292,7 @@ func EditUser(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
+		return
 	}
 	// 调用服务
 	svcErr := user_svc.EditUser(xid, req.Email, req.NickName)
@@ -333,6 +339,7 @@ func DeleteUser(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", "用户xid为空"),
 		})
+		return
 	}
 	// 调用服务
 	if svcErr := user_svc.DeleteUser(xid); svcErr != nil {

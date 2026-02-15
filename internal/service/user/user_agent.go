@@ -1,4 +1,4 @@
-package user_svc
+package user
 
 import (
 	"errors"

@@ -84,5 +84,25 @@
       "updatedAt": "更新时间",
       "operation": "操作"
     }
+  },
+  "role": {
+    "add": {
+      "header": "新增角色"
+    },
+    "edit": {
+      "header": "编辑角色"
+    },
+    "placeholder": {
+      "name": "输入角色名称",
+      "intro": "输入角色简介"
+    },
+    "label": {
+      "name": "名称",
+      "id": "主键",
+      "intro": "简介",
+      "createdAt": "创建时间",
+      "updatedAt": "更新时间",
+      "operation": "操作"
+    }
   }
 }

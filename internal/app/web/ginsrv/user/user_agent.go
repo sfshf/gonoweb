@@ -65,6 +65,7 @@ func ListUserAgent(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
+		return
 	}
 	// 调用服务
 	list, total, svcErr := user_svc.ListUserAgent(req.Page, req.PageSize)

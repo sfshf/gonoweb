@@ -79,7 +79,27 @@
     "label": {
       "name": "Name",
       "id": "ID",
-      "intro": "Avatar",
+      "intro": "Introduction",
+      "createdAt": "CreatedAt",
+      "updatedAt": "UpdatedAt",
+      "operation": "Operation"
+    }
+  },
+  "role": {
+    "add": {
+      "header": "Add Role"
+    },
+    "edit": {
+      "header": "Edit Role"
+    },
+    "placeholder": {
+      "name": "Enter role name",
+      "intro": "Enter role introduction"
+    },
+    "label": {
+      "name": "Name",
+      "id": "ID",
+      "intro": "Introduction",
       "createdAt": "CreatedAt",
       "updatedAt": "UpdatedAt",
       "operation": "Operation"

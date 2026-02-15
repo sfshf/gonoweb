@@ -1,4 +1,4 @@
-package domain_svc
+package domain
 
 import (
 	"fmt"
@@ -58,7 +58,7 @@ func AddDomain(name, intro string) (*TDomain, *SvcErr) {
 		}
 	} else {
 		// 如果是活域租户则报错
-		if !domain.DeletedAt.Valid {
+		if domain.DeletedAt == 0 {
 			return nil, &SvcErr{Err: fmt.Errorf("域租户[name=%s]已存在", name)}
 		}
 		// 如果是死域租户则激活

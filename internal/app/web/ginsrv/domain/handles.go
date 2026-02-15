@@ -30,10 +30,11 @@ func ListDomain(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
+		return
 	}
 	wheres := make(map[string][]any)
 	if req.Name != "" {
-		wheres["name=?"] = []any{req.Name}
+		wheres["name LIKE ?"] = []any{"%" + req.Name + "%"}
 	}
 	// 调用服务
 	list, total, svcErr := domain_svc.ListDomain(req.Page, req.PageSize, wheres)
@@ -84,6 +85,7 @@ func DomainInfo(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", "域租户xid为空"),
 		})
+		return
 	}
 	// 调用服务
 	result, svcErr := domain_svc.DomainInfo(xid)
@@ -131,6 +133,7 @@ func AddDomain(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
+		return
 	}
 	// 调用服务
 	result, svcErr := domain_svc.AddDomain(req.Name, req.Intro)
@@ -179,6 +182,7 @@ func EditDomain(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", "域租户xid为空"),
 		})
+		return
 	}
 	var req EditDomainReq
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
@@ -186,6 +190,7 @@ func EditDomain(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
+		return
 	}
 	// 调用服务
 	svcErr := domain_svc.EditDomain(xid, req.Name, req.Intro)
@@ -232,6 +237,7 @@ func DeleteDomain(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", "域租户xid为空"),
 		})
+		return
 	}
 	// 调用服务
 	if svcErr := domain_svc.DeleteDomain(xid); svcErr != nil {

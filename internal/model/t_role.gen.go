@@ -6,21 +6,19 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 const TableNameTRole = "t_role"
 
 // TRole mapped from table <t_role>
 type TRole struct {
-	ID        int64          `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	CreatedAt time.Time      `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt time.Time      `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at" json:"deleted_at"`
-	Xid       string         `gorm:"column:xid;not null" json:"xid"`
-	Name      string         `gorm:"column:name;not null" json:"name"`
-	Intro     string         `gorm:"column:intro" json:"intro"`
+	ID        int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
+	CreatedAt time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
+	DeletedAt int64     `gorm:"column:deleted_at" json:"deleted_at"`
+	Xid       string    `gorm:"column:xid;not null" json:"xid"`
+	Name      string    `gorm:"column:name;not null" json:"name"`
+	Intro     string    `gorm:"column:intro" json:"intro"`
 }
 
 // TableName TRole's table name

@@ -6,25 +6,23 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 const TableNameTCasbinRule = "t_casbin_rule"
 
 // TCasbinRule mapped from table <t_casbin_rule>
 type TCasbinRule struct {
-	ID        int64          `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	CreatedAt time.Time      `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt time.Time      `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at" json:"deleted_at"`
-	Ptype     string         `gorm:"column:ptype" json:"ptype"`
-	V0        string         `gorm:"column:v0" json:"v0"`
-	V1        string         `gorm:"column:v1" json:"v1"`
-	V2        string         `gorm:"column:v2" json:"v2"`
-	V3        string         `gorm:"column:v3" json:"v3"`
-	V4        string         `gorm:"column:v4" json:"v4"`
-	V5        string         `gorm:"column:v5" json:"v5"`
+	ID        int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
+	CreatedAt time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
+	DeletedAt int64     `gorm:"column:deleted_at" json:"deleted_at"`
+	Ptype     string    `gorm:"column:ptype" json:"ptype"`
+	V0        string    `gorm:"column:v0" json:"v0"`
+	V1        string    `gorm:"column:v1" json:"v1"`
+	V2        string    `gorm:"column:v2" json:"v2"`
+	V3        string    `gorm:"column:v3" json:"v3"`
+	V4        string    `gorm:"column:v4" json:"v4"`
+	V5        string    `gorm:"column:v5" json:"v5"`
 }
 
 // TableName TCasbinRule's table name

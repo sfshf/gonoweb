@@ -1,4 +1,4 @@
-package casbin_svc
+package casbin
 
 import (
 	"errors"

@@ -1,4 +1,4 @@
-package role_svc
+package role
 
 import (
 	"fmt"
@@ -10,8 +10,11 @@ import (
 	. "github.com/sfshf/gonoweb/internal/service"
 )
 
-func ListRole(page, pageSize int) ([]TRole, int64, *SvcErr) {
+func ListRole(page, pageSize int, wheres map[string][]any) ([]TRole, int64, *SvcErr) {
 	db := repo.GormDB.Table(TableNameTRole)
+	for query, args := range wheres {
+		db = db.Where(query, args...)
+	}
 	var total int64
 	if err := db.Count(&total).Error; err != nil {
 		return nil, total, &SvcErr{Internal: true, Err: err}
@@ -55,7 +58,7 @@ func AddRole(name, intro string) (*TRole, *SvcErr) {
 		}
 	} else {
 		// 如果是活角色则报错
-		if !role.DeletedAt.Valid {
+		if role.DeletedAt == 0 {
 			return nil, &SvcErr{Err: fmt.Errorf("角色[name=%s]已存在", name)}
 		}
 		// 如果是死角色则激活

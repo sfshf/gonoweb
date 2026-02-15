@@ -6,23 +6,21 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 const TableNameTMenuWidgetAPI = "t_menu_widget_api"
 
 // TMenuWidgetAPI mapped from table <t_menu_widget_api>
 type TMenuWidgetAPI struct {
-	ID         int64          `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	CreatedAt  time.Time      `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt  time.Time      `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
-	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at" json:"deleted_at"`
-	Type       int32          `gorm:"column:type;not null" json:"type"`
-	Identifier string         `gorm:"column:identifier;not null" json:"identifier"`
-	Name       string         `gorm:"column:name;not null" json:"name"`
-	Intro      string         `gorm:"column:intro" json:"intro"`
-	Icon       string         `gorm:"column:icon" json:"icon"`
+	ID         int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
+	CreatedAt  time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt  time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
+	DeletedAt  int64     `gorm:"column:deleted_at" json:"deleted_at"`
+	Type       int32     `gorm:"column:type;not null" json:"type"`
+	Identifier string    `gorm:"column:identifier;not null" json:"identifier"`
+	Name       string    `gorm:"column:name;not null" json:"name"`
+	Intro      string    `gorm:"column:intro" json:"intro"`
+	Icon       string    `gorm:"column:icon" json:"icon"`
 }
 
 // TableName TMenuWidgetAPI's table name

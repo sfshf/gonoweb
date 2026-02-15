@@ -12,6 +12,7 @@ import (
 
 type ListRoleReq struct {
 	gono_web.Pagination
+	Name string `json:"name" form:"name" binding:""`
 }
 
 type ListRoleResp struct {
@@ -40,9 +41,14 @@ func ListRole(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
+		return
+	}
+	wheres := make(map[string][]any)
+	if req.Name != "" {
+		wheres["name LIKE ?"] = []any{"%" + req.Name + "%"}
 	}
 	// 调用服务
-	list, total, svcErr := role_svc.ListRole(req.Page, req.PageSize)
+	list, total, svcErr := role_svc.ListRole(req.Page, req.PageSize, wheres)
 	if svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &gono_web.Response{
@@ -90,6 +96,7 @@ func RoleInfo(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", "角色xid为空"),
 		})
+		return
 	}
 	// 调用服务
 	result, svcErr := role_svc.RoleInfo(xid)
@@ -142,6 +149,7 @@ func AddRole(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
+		return
 	}
 	// 调用服务
 	result, svcErr := role_svc.AddRole(req.Name, req.Intro)
@@ -195,6 +203,7 @@ func EditRole(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", "角色xid为空"),
 		})
+		return
 	}
 	var req EditRoleReq
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
@@ -202,6 +211,7 @@ func EditRole(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
+		return
 	}
 	// 调用服务
 	svcErr := role_svc.EditRole(xid, req.Name, req.Intro)
@@ -248,6 +258,7 @@ func DeleteRole(c *gin.Context) {
 			Code: gono_web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", "角色xid为空"),
 		})
+		return
 	}
 	// 调用服务
 	if svcErr := role_svc.DeleteRole(xid); svcErr != nil {

@@ -60,6 +60,9 @@ const AddDomain = ({
     name: "",
     intro: "",
   });
+  React.useEffect(() => {
+    dispatch({ value: { name: "", intro: "" } });
+  }, [isOpen]);
   const onValueChangeName = (value: string) => {
     dispatch({ type: "name", value });
   };
@@ -171,6 +174,11 @@ const EditDomain = ({
     name: domain?.name ?? "",
     intro: domain?.intro ?? "",
   });
+  React.useEffect(() => {
+    dispatch({ type: "xid", value: domain?.xid ?? "" });
+    dispatch({ type: "name", value: domain?.name ?? "" });
+    dispatch({ type: "intro", value: domain?.intro ?? "" });
+  }, [domain]);
   const onValueChangeName = (value: string) => {
     dispatch({ type: "name", value });
   };
@@ -206,10 +214,6 @@ const EditDomain = ({
       });
     }
   };
-  React.useEffect(() => {
-    dispatch({ type: "name", value: domain?.name ?? "" });
-    dispatch({ type: "intro", value: domain?.intro ?? "" });
-  }, [domain]);
   return (
     <>
       <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>

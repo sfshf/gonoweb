@@ -60,6 +60,9 @@ const AddUser = ({
     email: "",
     nickname: "",
   });
+  React.useEffect(() => {
+    dispatch({ value: { email: "", nickname: "" } });
+  }, [isOpen]);
   const onValueChangeEmail = (value: string) => {
     dispatch({ type: "email", value });
   };
@@ -176,6 +179,11 @@ const EditUser = ({
     email: user?.email ?? "",
     nickname: user?.nick_name ?? "",
   });
+  React.useEffect(() => {
+    dispatch({ type: "xid", value: user?.xid ?? "" });
+    dispatch({ type: "email", value: user?.email ?? "" });
+    dispatch({ type: "nickname", value: user?.nick_name ?? "" });
+  }, [user]);
   const onValueChangeEmail = (value: string) => {
     dispatch({ type: "email", value });
   };
@@ -216,10 +224,6 @@ const EditUser = ({
       });
     }
   };
-  React.useEffect(() => {
-    dispatch({ type: "email", value: user?.email ?? "" });
-    dispatch({ type: "nickname", value: user?.nick_name ?? "" });
-  }, [user]);
   return (
     <>
       <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>

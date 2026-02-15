@@ -20,7 +20,7 @@ export const listDomain = async (req: ListDomainReq): Promise<any> => {
 };
 
 export type AddDomainReq = {
-  email: string;
+  name: string;
   intro: string;
 };
 

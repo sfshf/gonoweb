@@ -6,24 +6,22 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 const TableNameTUser = "t_user"
 
 // TUser mapped from table <t_user>
 type TUser struct {
-	ID        int64          `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	CreatedAt time.Time      `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt time.Time      `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at" json:"deleted_at"`
-	Xid       string         `gorm:"column:xid;not null" json:"xid"`
-	Email     string         `gorm:"column:email;not null" json:"email"`
-	NickName  string         `gorm:"column:nick_name" json:"nick_name"`
-	RealName  string         `gorm:"column:real_name" json:"real_name"`
-	Password  string         `gorm:"column:password" json:"password"`
-	Avatar    string         `gorm:"column:avatar" json:"avatar"`
+	ID        int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
+	CreatedAt time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
+	DeletedAt int64     `gorm:"column:deleted_at" json:"deleted_at"`
+	Xid       string    `gorm:"column:xid;not null" json:"xid"`
+	Email     string    `gorm:"column:email;not null" json:"email"`
+	NickName  string    `gorm:"column:nick_name" json:"nick_name"`
+	RealName  string    `gorm:"column:real_name" json:"real_name"`
+	Password  string    `gorm:"column:password" json:"password"`
+	Avatar    string    `gorm:"column:avatar" json:"avatar"`
 }
 
 // TableName TUser's table name

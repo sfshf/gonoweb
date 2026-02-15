@@ -37,9 +37,11 @@ import { AuthStore, TMenuWidget } from "@/zustand/types";
 import { User } from "@heroui/react";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
+import { usePathname } from "next/navigation";
 
 export const Navbar = () => {
   const { t } = useTranslation();
+  const pathname = usePathname();
   // 检查用户登录状态
   const token = useAuthStore((state: AuthStore) => state.token);
   const user = useAuthStore((state: AuthStore) => state.user);
@@ -107,8 +109,9 @@ export const Navbar = () => {
                 <NavbarItem key={menu.href}>
                   <NextLink
                     className={clsx(
-                      linkStyles({ color: "foreground" }),
-                      "data-[active=true]:text-primary data-[active=true]:font-medium",
+                      pathname === menu.href
+                        ? " text-blue-500 font-medium"
+                        : "text-gray-700 hover:text-blue-500 ",
                     )}
                     color='foreground'
                     href={menu.href}
