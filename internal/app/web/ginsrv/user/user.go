@@ -8,15 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	gono_web "github.com/sfshf/gonoweb/internal/app/web"
 	ginmw "github.com/sfshf/gonoweb/internal/app/web/ginsrv/middlewares"
-	"github.com/sfshf/gonoweb/internal/model"
 	user_svc "github.com/sfshf/gonoweb/internal/service/user"
 	jwt_util "github.com/sfshf/gonoweb/internal/util/jwt"
 )
-
-type SignInReq struct {
-	Account  string `json:"account" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
 
 // SignIn 用户登录
 // @Summary      用户登录
@@ -110,18 +104,6 @@ func SignOut(c *gin.Context) {
 	})
 }
 
-type ListUserReq struct {
-	gono_web.Pagination
-	Email    string `json:"email" form:"email" binding:""`
-	Nickname string `json:"nickname" form:"nickname" binding:""`
-	Realname string `json:"realname" form:"realname" binding:""`
-}
-
-type ListUserResp struct {
-	List  []model.TUser `json:"list"`
-	Total int64         `json:"total"`
-}
-
 // ListUser 获取用户列表
 // @Summary      获取用户列表
 // @Description  获取用户列表
@@ -144,7 +126,7 @@ func ListUser(c *gin.Context) {
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
 	}
-	wheres := make(map[string][]interface{})
+	wheres := make(map[string][]any)
 	if req.Email != "" {
 		wheres["email=?"] = []any{req.Email}
 	}
@@ -229,11 +211,6 @@ func UserInfo(c *gin.Context) {
 	})
 }
 
-type AddUserReq struct {
-	Email    string `json:"email" binding:"required"`
-	Nickname string `json:"nickname" binding:"required"`
-}
-
 // AddUser 新增用户
 // @Summary      新增用户
 // @Description  新增用户
@@ -279,11 +256,6 @@ func AddUser(c *gin.Context) {
 		Msg:  gono_web.ResponseMsg_OK,
 		Data: result,
 	})
-}
-
-type EditUserReq struct {
-	Email    string `json:"email" binding:"required"`
-	NickName string `json:"nickName" binding:"required"`
 }
 
 // EditUser 编辑用户

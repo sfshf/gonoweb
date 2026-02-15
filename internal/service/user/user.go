@@ -296,14 +296,14 @@ func SignOut(token string) error {
 
 func ListUser(page, pageSize int, wheres map[string][]any) ([]TUser, int64, *SvcErr) {
 	db := repo.GormDB.Table(TableNameTUser)
+	for query, args := range wheres {
+		db = db.Where(query, args...)
+	}
 	var total int64
 	if err := db.Count(&total).Error; err != nil {
 		return nil, total, &SvcErr{Internal: true, Err: err}
 	}
 	var list []TUser
-	for query, args := range wheres {
-		db = db.Where(query, args...)
-	}
 	if err := db.
 		Offset((page - 1) * pageSize).
 		Limit(pageSize).

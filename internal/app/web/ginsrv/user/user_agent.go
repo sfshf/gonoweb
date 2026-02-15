@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	gono_web "github.com/sfshf/gonoweb/internal/app/web"
 	ginmw "github.com/sfshf/gonoweb/internal/app/web/ginsrv/middlewares"
-	"github.com/sfshf/gonoweb/internal/model"
 	user_svc "github.com/sfshf/gonoweb/internal/service/user"
 )
 
@@ -43,15 +42,6 @@ func Visit(c *gin.Context) {
 		Code: gono_web.ResponseCode_OK,
 		Msg:  gono_web.ResponseMsg_OK,
 	})
-}
-
-type ListUserAgentReq struct {
-	gono_web.Pagination
-}
-
-type ListUserAgentResp struct {
-	List  []model.TUserAgent `json:"list"`
-	Total int64              `json:"total"`
 }
 
 // ListUserAgent 获取用户访问/登录记录列表

@@ -10,8 +10,11 @@ import (
 	. "github.com/sfshf/gonoweb/internal/service"
 )
 
-func ListDomain(page, pageSize int) ([]TDomain, int64, *SvcErr) {
+func ListDomain(page, pageSize int, wheres map[string][]any) ([]TDomain, int64, *SvcErr) {
 	db := repo.GormDB.Table(TableNameTDomain)
+	for query, args := range wheres {
+		db = db.Where(query, args...)
+	}
 	var total int64
 	if err := db.Count(&total).Error; err != nil {
 		return nil, total, &SvcErr{Internal: true, Err: err}

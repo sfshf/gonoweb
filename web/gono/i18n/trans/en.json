@@ -36,6 +36,10 @@
     "label": {
       "account": "Account",
       "password": "Password"
+    },
+    "placeholder": {
+      "nickname/email": "Enter your nickname/email",
+      "password": "Enter your password"
     }
   },
   "user": {
@@ -45,6 +49,10 @@
     "edit": {
       "header": "Edit User"
     },
+    "placeholder": {
+      "email": "Enter your email",
+      "nickname": "Enter your nickname"
+    },
     "label": {
       "email": "Email",
       "nickname": "Nickname",
@@ -52,6 +60,26 @@
       "id": "ID",
       "avatar": "Avatar",
       "password": "Password",
+      "createdAt": "CreatedAt",
+      "updatedAt": "UpdatedAt",
+      "operation": "Operation"
+    }
+  },
+  "domain": {
+    "add": {
+      "header": "Add Domain"
+    },
+    "edit": {
+      "header": "Edit Domain"
+    },
+    "placeholder": {
+      "name": "Enter domain name",
+      "intro": "Enter domain introduction"
+    },
+    "label": {
+      "name": "Name",
+      "id": "ID",
+      "intro": "Avatar",
       "createdAt": "CreatedAt",
       "updatedAt": "UpdatedAt",
       "operation": "Operation"

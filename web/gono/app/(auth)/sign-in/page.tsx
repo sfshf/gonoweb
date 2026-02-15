@@ -100,7 +100,7 @@ export default function SignInPage() {
             label={t("signIn.label.account")}
             labelPlacement='outside'
             name='nickname/email'
-            placeholder='Enter your nickname/email'
+            placeholder={t("signIn.placeholder.nickname/email")}
             type='text'
             onChange={onChangeAccount}
             onClear={onClearAccount}
@@ -111,7 +111,7 @@ export default function SignInPage() {
             label={t("signIn.label.Password")}
             labelPlacement='outside'
             name='password'
-            placeholder='Enter your password'
+            placeholder={t("signIn.placeholder.password")}
             type={passwordVisible ? "text" : "password"}
             endContent={
               <button

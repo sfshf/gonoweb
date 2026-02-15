@@ -22,11 +22,12 @@ CREATE TABLE `t_user` (
   `deleted_at` timestamp NULL,
   `xid` varchar(64) NOT NULL UNIQUE,
   `email` varchar(64) NOT NULL UNIQUE,
-  `nick_name` varchar(32) NULL UNIQUE,
+  `nick_name` varchar(32) NULL,
   `real_name` varchar(32) NULL,
   `password` varchar(64) DEFAULT NULL,
   `avatar` varchar(256) NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT uk_nick_name UNIQUE (nick_name, deleted_at)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- `t_role` 角色表
@@ -37,9 +38,10 @@ CREATE TABLE `t_role` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL,
   `xid` varchar(64) NOT NULL UNIQUE,
-  `name` varchar(64) NOT NULL UNIQUE,
+  `name` varchar(64) NOT NULL,
   `intro` varchar(256) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT uk_name UNIQUE (name, deleted_at)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- `t_menu_widget_api` 菜单、控件、API表
@@ -51,10 +53,11 @@ CREATE TABLE `t_menu_widget_api` (
   `deleted_at` timestamp NULL,
   `type` tinyint NOT NULL, -- 1: 菜单；2: 控件；3: api
   `identifier` varchar(256) NOT NULL UNIQUE,
-  `name` varchar(64) NOT NULL UNIQUE,
+  `name` varchar(64) NOT NULL,
   `intro` varchar(256) DEFAULT NULL,
   `icon` varchar(256) DEFAULT NULL, -- 菜单图标url
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT uk_name UNIQUE (name, deleted_at)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- `t_domain` 域租户表
@@ -65,9 +68,10 @@ CREATE TABLE `t_domain` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL,
   `xid` varchar(64) NOT NULL UNIQUE,
-  `name` varchar(64) NOT NULL UNIQUE,
+  `name` varchar(64) NOT NULL,
   `intro` varchar(256) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT uk_name UNIQUE (name, deleted_at)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- `t_casbin_rule` casbin规则表

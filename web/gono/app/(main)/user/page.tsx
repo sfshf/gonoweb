@@ -113,7 +113,7 @@ const AddUser = ({
                   label={t("user.label.email")}
                   isRequired
                   type='email'
-                  placeholder='Enter your email'
+                  placeholder={t("user.placeholder.email")}
                   variant='bordered'
                   onValueChange={onValueChangeEmail}
                   onClear={onClearEmail}
@@ -124,7 +124,7 @@ const AddUser = ({
                   }
                   label={t("user.label.nickname")}
                   isRequired
-                  placeholder='Enter your nickname'
+                  placeholder={t("user.placeholder.nickname")}
                   variant='bordered'
                   onValueChange={onValueChangeNickname}
                   onClear={onClearNickname}
@@ -237,7 +237,7 @@ const EditUser = ({
                   label={t("user.label.email")}
                   isRequired
                   type='email'
-                  placeholder='Enter your email'
+                  placeholder={t("user.placeholder.email")}
                   variant='bordered'
                   onValueChange={onValueChangeEmail}
                   onClear={onClearEmail}
@@ -250,7 +250,7 @@ const EditUser = ({
                   }
                   label={t("user.label.nickname")}
                   isRequired
-                  placeholder='Enter your nickname'
+                  placeholder={t("user.placeholder.nickname")}
                   variant='bordered'
                   onValueChange={onValueChangeNickname}
                   onClear={onClearNickname}

@@ -1,4 +1,4 @@
-package role
+package domain
 
 import (
 	"fmt"
@@ -6,18 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	gono_web "github.com/sfshf/gonoweb/internal/app/web"
-	"github.com/sfshf/gonoweb/internal/model"
 	domain_svc "github.com/sfshf/gonoweb/internal/service/domain"
 )
-
-type ListDomainReq struct {
-	gono_web.Pagination
-}
-
-type ListDomainResp struct {
-	List  []model.TDomain `json:"list"`
-	Total int64           `json:"total"`
-}
 
 // ListDomain 获取域租户列表
 // @Summary      获取域租户列表
@@ -41,8 +31,12 @@ func ListDomain(c *gin.Context) {
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
 	}
+	wheres := make(map[string][]any)
+	if req.Name != "" {
+		wheres["name=?"] = []any{req.Name}
+	}
 	// 调用服务
-	list, total, svcErr := domain_svc.ListDomain(req.Page, req.PageSize)
+	list, total, svcErr := domain_svc.ListDomain(req.Page, req.PageSize, wheres)
 	if svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &gono_web.Response{
@@ -116,11 +110,6 @@ func DomainInfo(c *gin.Context) {
 	})
 }
 
-type AddDomainReq struct {
-	Name  string `json:"name" binding:"gt=0"`
-	Intro string `json:"intro" binding:"gt=0"`
-}
-
 // AddDomain 新增域租户
 // @Summary      新增域租户
 // @Description  新增域租户
@@ -166,11 +155,6 @@ func AddDomain(c *gin.Context) {
 		Msg:  gono_web.ResponseMsg_OK,
 		Data: result,
 	})
-}
-
-type EditDomainReq struct {
-	Name  string `json:"name" binding:"gt=0"`
-	Intro string `json:"intro" binding:"gt=0"`
 }
 
 // EditDomain 编辑域租户
