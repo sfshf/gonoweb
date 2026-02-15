@@ -3,7 +3,6 @@ import {
   Navbar as HeroUINavbar,
   NavbarContent,
   NavbarMenu,
-  NavbarMenuToggle,
   NavbarBrand,
   NavbarItem,
   NavbarMenuItem,
@@ -18,6 +17,7 @@ import clsx from "clsx";
 import React from "react";
 import { hasMenu, siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
+import { GlobeIcon } from "@/components/icons";
 import {
   GithubIcon,
   UserCircleIcon,
@@ -25,7 +25,6 @@ import {
   Logo,
 } from "@/components/icons";
 import { useAuthStore } from "@/zustand/user";
-import { useRouter } from "next/navigation";
 import {
   Dropdown,
   DropdownTrigger,
@@ -36,20 +35,15 @@ import {
 import { signOut } from "@/api/user";
 import { AuthStore, TMenuWidget } from "@/zustand/types";
 import { User } from "@heroui/react";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 
 export const Navbar = () => {
-  const router = useRouter();
+  const { t } = useTranslation();
   // 检查用户登录状态
   const token = useAuthStore((state: AuthStore) => state.token);
   const user = useAuthStore((state: AuthStore) => state.user);
   const menus = useAuthStore((state: AuthStore) => state.menus);
-  React.useEffect(() => {
-    // 未登录，则跳转登录页
-    if (!token) {
-      router.push("/sign-in");
-      return;
-    }
-  }, [token]);
 
   const searchInput = (
     <Input
@@ -64,7 +58,7 @@ export const Navbar = () => {
         </Kbd>
       }
       labelPlacement='outside'
-      placeholder='Search...'
+      placeholder={t("app.label.search")}
       startContent={
         <SearchIcon className='text-base text-default-400 pointer-events-none flex-shrink-0' />
       }
@@ -79,10 +73,18 @@ export const Navbar = () => {
     } finally {
       clearAuth();
       addToast({
-        title: "OK",
+        title: t("app.prompt.ok"),
         color: "success",
       });
     }
+  };
+  const [langs, setLangs] = React.useState<readonly string[]>(
+    Array.isArray(i18next.options.supportedLngs)
+      ? i18next.options.supportedLngs
+      : [],
+  );
+  const onPressLang = (lang: string) => () => {
+    i18next.changeLanguage(lang, (err, t) => {});
   };
 
   return (
@@ -106,12 +108,12 @@ export const Navbar = () => {
                   <NextLink
                     className={clsx(
                       linkStyles({ color: "foreground" }),
-                      "data-[active=true]:text-primary data-[active=true]:font-medium"
+                      "data-[active=true]:text-primary data-[active=true]:font-medium",
                     )}
                     color='foreground'
                     href={menu.href}
                   >
-                    {menu.label}
+                    {t("app.menus." + menu.label)}
                   </NextLink>
                 </NavbarItem>
               );
@@ -128,6 +130,27 @@ export const Navbar = () => {
             <GithubIcon className='text-default-500' />
           </Link>
           <ThemeSwitch />
+          <Dropdown>
+            <DropdownTrigger>
+              <GlobeIcon
+                className='cursor-pointer text-default-500 opacity-100 hover:opacity-80'
+                size={22}
+              />
+            </DropdownTrigger>
+            <DropdownMenu aria-label='Static Actions'>
+              {langs.map((item) => {
+                if (item != "cimode") {
+                  return (
+                    <DropdownItem key={item} onPress={onPressLang(item)}>
+                      {t("app.lang." + item)}
+                    </DropdownItem>
+                  );
+                } else {
+                  return null;
+                }
+              })}
+            </DropdownMenu>
+          </Dropdown>
         </NavbarItem>
         <NavbarItem className='hidden lg:flex'>{searchInput}</NavbarItem>
         <NavbarItem className='hidden md:flex'>
@@ -139,7 +162,7 @@ export const Navbar = () => {
               startContent={<UserCircleIcon className='text-blue' />}
               variant='flat'
             >
-              登录
+              {t("app.label.signIn")}
             </Button>
           )}
           {token && user && (
@@ -160,20 +183,12 @@ export const Navbar = () => {
                   color='danger'
                   onPress={onPressSignOut}
                 >
-                  登出
+                  {t("app.label.signOut")}
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           )}
         </NavbarItem>
-      </NavbarContent>
-
-      <NavbarContent className='sm:hidden basis-1 pl-4' justify='end'>
-        <Link isExternal aria-label='Github' href={siteConfig.links.github}>
-          <GithubIcon className='text-default-500' />
-        </Link>
-        <ThemeSwitch />
-        <NavbarMenuToggle />
       </NavbarContent>
 
       <NavbarMenu>

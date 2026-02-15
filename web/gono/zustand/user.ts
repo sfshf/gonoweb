@@ -31,3 +31,25 @@ export const useAuthStore = create<AuthStore>()(
     }
   )
 );
+
+export const isRoot = (): boolean => {
+  const user = useAuthStore.getState().user;
+  if (user && user.email === process.env.NEXT_PUBLIC_ROOT_EMAIL) {
+    return true;
+  }
+  return false;
+};
+
+// hasWidget 判断用户有没有控件权限
+export const hasWidget = (identifier: string): boolean => {
+  const widgets = useAuthStore.getState().widgets;
+  if (!widgets) {
+    return false;
+  }
+  for (const item of widgets) {
+    if (item.identifier == identifier) {
+      return true;
+    }
+  }
+  return false;
+};

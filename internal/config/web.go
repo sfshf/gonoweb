@@ -68,7 +68,8 @@ type rootConfig struct {
 }
 
 type cryptoConfig struct {
-	PasswordSalt string `toml:"passwordSalt"`
+	PasswordSalt    string `toml:"passwordSalt"`
+	DefaultPassword string `toml:"defaultPassword"`
 }
 
 type ginConfig struct {

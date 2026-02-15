@@ -29,34 +29,34 @@ export const siteConfig = {
 // siteMenus 网站菜单列表
 export const siteMenus = [
   {
-    label: "Undefined",
+    label: "undefined",
     href: "/undefined",
   },
   {
-    label: "User",
+    label: "user",
     href: "/user",
   },
   {
-    label: "Domain",
+    label: "domain",
     href: "/domain",
   },
   {
-    label: "Role",
+    label: "role",
     href: "/role",
   },
   {
-    label: "Menu",
+    label: "menu",
     href: "/menu",
   },
   {
-    label: "API",
+    label: "api",
     href: "/api",
   },
 ];
 
 // hasMenu 判断菜单是否存在
 export const hasMenu = (
-  identifier: string
+  identifier: string,
 ): { label: string; href: string } | null => {
   for (const item of siteMenus) {
     if (item.href == identifier) {
@@ -67,113 +67,29 @@ export const hasMenu = (
 };
 
 // siteWidgets 网站控件列表
-export const siteWidgets = [
-  {
-    id: "btn_add_user",
-    label: "",
-  },
-  {
-    id: "btn_update_user",
-    label: "",
-  },
-  {
-    id: "btn_delete_user",
-    label: "",
-  },
-  {
-    id: "btn_search_user",
-    label: "",
-  },
-  {
-    id: "btn_add_domain",
-    label: "",
-  },
-  {
-    id: "btn_update_domain",
-    label: "",
-  },
-  {
-    id: "btn_delete_domain",
-    label: "",
-  },
-  {
-    id: "btn_search_domain",
-    label: "",
-  },
-  {
-    id: "btn_add_role",
-    label: "",
-  },
-  {
-    id: "btn_update_role",
-    label: "",
-  },
-  {
-    id: "btn_delete_role",
-    label: "",
-  },
-  {
-    id: "btn_search_role",
-    label: "",
-  },
-  {
-    id: "btn_add_menu",
-    label: "",
-  },
-  {
-    id: "btn_update_menu",
-    label: "",
-  },
-  {
-    id: "btn_delete_menu",
-    label: "",
-  },
-  {
-    id: "btn_search_menu",
-    label: "",
-  },
-  {
-    id: "btn_add_widget",
-    label: "",
-  },
-  {
-    id: "btn_update_widget",
-    label: "",
-  },
-  {
-    id: "btn_delete_widget",
-    label: "",
-  },
-  {
-    id: "btn_search_widget",
-    label: "",
-  },
-  {
-    id: "btn_add_api",
-    label: "",
-  },
-  {
-    id: "btn_update_api",
-    label: "",
-  },
-  {
-    id: "btn_delete_api",
-    label: "",
-  },
-  {
-    id: "btn_search_api",
-    label: "",
-  },
-];
-
-// hasWidgets 判断控件是否存在
-export const hasWidgets = (
-  identifier: string
-): { id: string; label: string } | null => {
-  for (const item of siteWidgets) {
-    if (item.id == identifier) {
-      return { ...item };
-    }
-  }
-  return null;
+export const siteWidgets = {
+  btn_add_user: "btn_add_user",
+  btn_update_user: "btn_update_user",
+  btn_delete_user: "btn_delete_user",
+  btn_search_user: "btn_search_user",
+  btn_add_domain: "btn_add_domain",
+  btn_update_domain: "btn_update_domain",
+  btn_delete_domain: "btn_delete_domain",
+  btn_search_domain: "btn_search_domain",
+  btn_add_role: "btn_add_role",
+  btn_update_role: "btn_update_role",
+  btn_delete_role: "btn_delete_role",
+  btn_search_role: "btn_search_role",
+  btn_add_menu: "btn_add_menu",
+  btn_update_menu: "btn_update_menu",
+  btn_delete_menu: "btn_delete_menu",
+  btn_search_menu: "btn_search_menu",
+  btn_add_widget: "btn_add_widget",
+  btn_update_widget: "btn_update_widget",
+  btn_delete_widget: "btn_delete_widget",
+  btn_search_widget: "btn_search_widget",
+  btn_add_api: "btn_add_api",
+  btn_update_api: "btn_update_api",
+  btn_delete_api: "btn_delete_api",
+  btn_search_api: "btn_search_api",
 };

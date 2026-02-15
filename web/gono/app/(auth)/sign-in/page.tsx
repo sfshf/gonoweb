@@ -61,14 +61,14 @@ export default function SignInPage() {
         resp.data.domain,
         resp.data.role,
         resp.data.menus,
-        resp.data.widgets
+        resp.data.widgets,
       );
       addToast({
-        title: "OK",
+        title: t("app.prompt.ok"),
         description: resp.msg,
         color: "success",
       });
-      router.push("/");
+      router.back();
     } catch (e) {
       addToast({
         title: (e as Error).cause as string,
@@ -97,7 +97,7 @@ export default function SignInPage() {
           <Input
             isRequired
             errorMessage='Please enter a valid nickname/email'
-            label='Account'
+            label={t("signIn.label.account")}
             labelPlacement='outside'
             name='nickname/email'
             placeholder='Enter your nickname/email'
@@ -108,9 +108,9 @@ export default function SignInPage() {
           <Input
             isRequired
             errorMessage='Please enter password'
-            label='Password'
+            label={t("signIn.label.Password")}
             labelPlacement='outside'
-            name='email'
+            name='password'
             placeholder='Enter your password'
             type={passwordVisible ? "text" : "password"}
             endContent={
@@ -139,7 +139,7 @@ export default function SignInPage() {
             type='submit'
             disabled={signInForm.account == "" || signInForm.password == ""}
           >
-            {t("app.signIn.btn.1")}
+            {t("signIn.btn.1")}
           </Button>
         </Form>
       </CardBody>

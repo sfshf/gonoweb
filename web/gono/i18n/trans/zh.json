@@ -1,9 +1,60 @@
 {
   "app": {
-    "signIn": {
-      "btn": {
-        "1": "登 录"
-      }
+    "menus": {
+      "undefined": "未定义",
+      "user": "用户",
+      "domain": "域/租户",
+      "role": "角色",
+      "menu": "菜单",
+      "api": "应用接口"
+    },
+    "btn": {
+      "search": "搜索",
+      "add": "新增",
+      "confirm": "确定",
+      "close": "关闭"
+    },
+    "prompt": {
+      "tableNoContent": "无数据可展示",
+      "ok": "成功",
+      "delete": "确认删除 {{target}} ？"
+    },
+    "label": {
+      "signIn": "登录",
+      "signOut": "登出",
+      "search": "搜索"
+    },
+    "lang": {
+      "en": "英语",
+      "zh": "中文（简体）"
+    }
+  },
+  "signIn": {
+    "btn": {
+      "1": "登 录"
+    },
+    "label": {
+      "account": "账号",
+      "password": "密码"
+    }
+  },
+  "user": {
+    "add": {
+      "header": "新增用户"
+    },
+    "edit": {
+      "header": "编辑用户"
+    },
+    "label": {
+      "email": "邮箱",
+      "nickname": "昵称",
+      "realname": "真实姓名",
+      "id": "主键",
+      "avatar": "头像",
+      "password": "密码",
+      "createdAt": "创建时间",
+      "updatedAt": "更新时间",
+      "operation": "操作"
     }
   }
 }

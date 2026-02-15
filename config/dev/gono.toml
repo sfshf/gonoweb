@@ -13,6 +13,7 @@ password = "dev123"
 
 [crypto]
 passwordSalt = "password_salt"
+defaultPassword = "password"
 
 [gin]
 swagdoc = true

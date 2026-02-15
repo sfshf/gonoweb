@@ -1,9 +1,60 @@
 {
   "app": {
-    "signIn": {
-      "btn": {
-        "1": "Sign In"
-      }
+    "menus": {
+      "undefined": "Undefined",
+      "user": "User",
+      "domain": "Domain",
+      "role": "Role",
+      "menu": "Menu",
+      "api": "API"
+    },
+    "btn": {
+      "search": "Search",
+      "add": "Add",
+      "confirm": "Confirm",
+      "close": "Close"
+    },
+    "prompt": {
+      "tableNoContent": "No rows to display.",
+      "ok": "OK",
+      "delete": "Confirm to delete {{target}} ?"
+    },
+    "label": {
+      "signIn": "Sign In",
+      "signOut": "Sign Out",
+      "search": "Search"
+    },
+    "lang": {
+      "en": "English",
+      "zh": "Chinese"
+    }
+  },
+  "signIn": {
+    "btn": {
+      "1": "Sign In"
+    },
+    "label": {
+      "account": "Account",
+      "password": "Password"
+    }
+  },
+  "user": {
+    "add": {
+      "header": "Add User"
+    },
+    "edit": {
+      "header": "Edit User"
+    },
+    "label": {
+      "email": "Email",
+      "nickname": "Nickname",
+      "realname": "Realname",
+      "id": "ID",
+      "avatar": "Avatar",
+      "password": "Password",
+      "createdAt": "CreatedAt",
+      "updatedAt": "UpdatedAt",
+      "operation": "Operation"
     }
   }
 }

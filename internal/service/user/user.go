@@ -294,13 +294,16 @@ func SignOut(token string) error {
 	return user_repo.UserAgent_DeleteByToken(token)
 }
 
-func ListUser(page, pageSize int) ([]TUser, int64, *SvcErr) {
+func ListUser(page, pageSize int, wheres map[string][]any) ([]TUser, int64, *SvcErr) {
 	db := repo.GormDB.Table(TableNameTUser)
 	var total int64
 	if err := db.Count(&total).Error; err != nil {
 		return nil, total, &SvcErr{Internal: true, Err: err}
 	}
 	var list []TUser
+	for query, args := range wheres {
+		db = db.Where(query, args...)
+	}
 	if err := db.
 		Offset((page - 1) * pageSize).
 		Limit(pageSize).
@@ -321,7 +324,7 @@ func UserInfo(xid string) (*TUser, *SvcErr) {
 	return user, nil
 }
 
-func AddUser(email, password string) (*TUser, *SvcErr) {
+func AddUser(email, nickname string) (*TUser, *SvcErr) {
 	// 搜索有没有重复的、删除的记录
 	user, err := user_repo.User_FirstUnscopedByEmail(email)
 	if err != nil {
@@ -332,7 +335,8 @@ func AddUser(email, password string) (*TUser, *SvcErr) {
 		user := &TUser{
 			Xid:      xid.New().String(),
 			Email:    email,
-			Password: password,
+			Password: EncryptPlainPassword(config.AppConfig.Crypto.DefaultPassword),
+			NickName: nickname,
 		}
 		if err := repo.Create(user); err != nil {
 			return nil, &SvcErr{Internal: true, Err: err}
@@ -344,7 +348,7 @@ func AddUser(email, password string) (*TUser, *SvcErr) {
 		}
 		// 如果是死用户则激活
 		if err := user_repo.User_ReliveByXid(user.Xid, &TUser{
-			Password: password,
+			Password: EncryptPlainPassword(config.AppConfig.Crypto.DefaultPassword),
 		}); err != nil {
 			return nil, &SvcErr{Internal: true, Err: err}
 		}
@@ -352,10 +356,10 @@ func AddUser(email, password string) (*TUser, *SvcErr) {
 	return user, nil
 }
 
-func EditUser(xid, nickName, realName string) *SvcErr {
+func EditUser(xid, email, nickName string) *SvcErr {
 	if err := user_repo.User_UpdateByXid(xid, &TUser{
+		Email:    email,
 		NickName: nickName,
-		RealName: realName,
 	}); err != nil {
 		return &SvcErr{Internal: true, Err: err}
 	}

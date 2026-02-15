@@ -112,6 +112,9 @@ func SignOut(c *gin.Context) {
 
 type ListUserReq struct {
 	gono_web.Pagination
+	Email    string `json:"email" form:"email" binding:""`
+	Nickname string `json:"nickname" form:"nickname" binding:""`
+	Realname string `json:"realname" form:"realname" binding:""`
 }
 
 type ListUserResp struct {
@@ -141,8 +144,18 @@ func ListUser(c *gin.Context) {
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
 	}
+	wheres := make(map[string][]interface{})
+	if req.Email != "" {
+		wheres["email=?"] = []any{req.Email}
+	}
+	if req.Nickname != "" {
+		wheres["nick_name LIKE ?"] = []any{"%" + req.Nickname + "%"}
+	}
+	if req.Realname != "" {
+		wheres["real_name=?"] = []any{req.Realname}
+	}
 	// 调用服务
-	list, total, svcErr := user_svc.ListUser(req.Page, req.PageSize)
+	list, total, svcErr := user_svc.ListUser(req.Page, req.PageSize, wheres)
 	if svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &gono_web.Response{
@@ -217,8 +230,8 @@ func UserInfo(c *gin.Context) {
 }
 
 type AddUserReq struct {
-	Email    string `json:"email" binding:"email"`
-	Password string `json:"password" binding:"gt=15"`
+	Email    string `json:"email" binding:"required"`
+	Nickname string `json:"nickname" binding:"required"`
 }
 
 // AddUser 新增用户
@@ -244,7 +257,7 @@ func AddUser(c *gin.Context) {
 		})
 	}
 	// 调用服务
-	result, svcErr := user_svc.AddUser(req.Email, req.Password)
+	result, svcErr := user_svc.AddUser(req.Email, req.Nickname)
 	if svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &gono_web.Response{
@@ -269,8 +282,8 @@ func AddUser(c *gin.Context) {
 }
 
 type EditUserReq struct {
-	NickName string `json:"nickName" binding:""`
-	RealName string `json:"realName" binding:""`
+	Email    string `json:"email" binding:"required"`
+	NickName string `json:"nickName" binding:"required"`
 }
 
 // EditUser 编辑用户
@@ -304,7 +317,7 @@ func EditUser(c *gin.Context) {
 		})
 	}
 	// 调用服务
-	svcErr := user_svc.EditUser(xid, req.NickName, req.RealName)
+	svcErr := user_svc.EditUser(xid, req.Email, req.NickName)
 	if svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &gono_web.Response{

@@ -44,7 +44,7 @@ func LoadAuthHandles_V1(rg *gin.RouterGroup) {
 		userg.GET("/agent", user_handles.ListUserAgent)
 		userg.GET("", user_handles.ListUser)
 		userg.GET("/:xid", user_handles.UserInfo)
-		userg.POST("/", user_handles.AddUser)
+		userg.POST("", user_handles.AddUser)
 		userg.PUT("/:xid", user_handles.EditUser)
 		userg.DELETE("/:xid", user_handles.DeleteUser)
 	}
@@ -54,7 +54,7 @@ func LoadAuthHandles_V1(rg *gin.RouterGroup) {
 	{
 		roleg.GET("", role_handles.ListRole)
 		roleg.GET("/:xid", role_handles.RoleInfo)
-		roleg.POST("/", role_handles.AddRole)
+		roleg.POST("", role_handles.AddRole)
 		roleg.PUT("/:xid", role_handles.EditRole)
 		roleg.DELETE("/:xid", role_handles.DeleteRole)
 	}
@@ -64,7 +64,7 @@ func LoadAuthHandles_V1(rg *gin.RouterGroup) {
 	{
 		domaing.GET("", domain_handles.ListDomain)
 		domaing.GET("/:xid", domain_handles.DomainInfo)
-		domaing.POST("/", domain_handles.AddDomain)
+		domaing.POST("", domain_handles.AddDomain)
 		domaing.PUT("/:xid", domain_handles.EditDomain)
 		domaing.DELETE("/:xid", domain_handles.DeleteDomain)
 	}
