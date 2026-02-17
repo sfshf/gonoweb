@@ -1,5 +1,4 @@
 import { deleteJson, getJson, postJson, putJson } from ".";
-import { md5 } from "@noble/hashes/legacy.js";
 
 export type ListDomainReq = {
   page: number;

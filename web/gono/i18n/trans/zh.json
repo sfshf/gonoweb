@@ -5,8 +5,7 @@
       "user": "用户",
       "domain": "域/租户",
       "role": "角色",
-      "menu": "菜单",
-      "api": "应用接口"
+      "resource": "资源"
     },
     "btn": {
       "search": "搜索",
@@ -93,12 +92,41 @@
       "header": "编辑角色"
     },
     "placeholder": {
-      "name": "输入角色名称",
-      "intro": "输入角色简介"
+      "name": "输入角色名称"
     },
     "label": {
       "name": "名称",
       "id": "主键",
+      "intro": "简介",
+      "createdAt": "创建时间",
+      "updatedAt": "更新时间",
+      "operation": "操作"
+    }
+  },
+  "resource": {
+    "type": {
+      "menu": "菜单",
+      "widget": "控件",
+      "api": "接口"
+    },
+    "add": {
+      "header": "新增资源"
+    },
+    "edit": {
+      "header": "编辑资源"
+    },
+    "placeholder": {
+      "type": "选择一个类型",
+      "id": "输入资源标识符",
+      "name": "输入资源名称",
+      "intro": "输入资源简介",
+      "icon": "输入图标"
+    },
+    "label": {
+      "name": "名称",
+      "icon": "图标",
+      "id": "标识符",
+      "type": "类型",
       "intro": "简介",
       "createdAt": "创建时间",
       "updatedAt": "更新时间",

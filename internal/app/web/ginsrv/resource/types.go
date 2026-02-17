@@ -7,8 +7,9 @@ import (
 
 type ListResourceReq struct {
 	gono_web.Pagination
-	ID   string `json:"id" form:"id" binding:""`
-	Name string `json:"name" form:"name" binding:""`
+	Type       int    `json:"type" form:"type" binding:""`
+	Name       string `json:"name" form:"name" binding:""`
+	Identifier string `json:"identifier" form:"identifier" binding:""`
 }
 
 type ListResourceResp struct {
@@ -17,11 +18,11 @@ type ListResourceResp struct {
 }
 
 type AddResourceReq struct {
-	Type  int32  `json:"type" binding:"oneof=1 2 3"`
-	ID    string `json:"id" binding:"gt=0"`
-	Name  string `json:"name" binding:"gt=0"`
-	Intro string `json:"intro" binding:"gt=0"`
-	Icon  string `json:"icon" binding:""`
+	Type       int32  `json:"type" binding:"oneof=1 2 3"`
+	Identifier string `json:"identifier" binding:"gt=0"`
+	Name       string `json:"name" binding:"gt=0"`
+	Intro      string `json:"intro" binding:"gt=0"`
+	Icon       string `json:"icon" binding:""`
 }
 
 type EditResourceReq struct {

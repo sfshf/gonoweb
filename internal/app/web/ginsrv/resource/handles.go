@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sfshf/gonoweb/internal/app/web"
@@ -35,11 +36,14 @@ func ListResource(c *gin.Context) {
 		return
 	}
 	wheres := make(map[string][]any)
-	if req.ID != "" {
-		wheres["identifier=?"] = []any{req.ID}
+	if req.Type > 0 {
+		wheres["type=?"] = []any{req.Type}
 	}
 	if req.Name != "" {
 		wheres["name LIKE ?"] = []any{"%" + req.Name + "%"}
+	}
+	if req.Identifier != "" {
+		wheres["identifier LIKE ?"] = []any{"%" + req.Identifier + "%"}
 	}
 	// 调用服务
 	list, total, svcErr := resource.ListResource(req.Page, req.PageSize, wheres)
@@ -92,8 +96,16 @@ func ResourceInfo(c *gin.Context) {
 		})
 		return
 	}
+	idN, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", "菜单/控件/API的id非整型数字"),
+		})
+		return
+	}
 	// 调用服务
-	result, svcErr := resource.ResourceInfo(id)
+	result, svcErr := resource.ResourceInfo(idN)
 	if svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &web.Response{
@@ -117,34 +129,34 @@ func ResourceInfo(c *gin.Context) {
 	})
 }
 
-func validateID(typ int32, id string) error {
+func validateIdentifier(typ int32, identifier string) error {
 	switch typ {
 	case 1: // menu
-		matched, err := regexp.MatchString(`^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, id)
+		matched, err := regexp.MatchString(`^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, identifier)
 		if err != nil {
 			return err
 		}
 		if !matched {
-			return errors.New("menu id must be `^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
+			return errors.New("menu identifier must be `^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
 		}
 	case 2: // widget
-		matched, err := regexp.MatchString(`^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`, id)
+		matched, err := regexp.MatchString(`^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`, identifier)
 		if err != nil {
 			return err
 		}
 		if !matched {
-			return errors.New("widget id must be `^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`")
+			return errors.New("widget identifier must be `^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`")
 		}
 	case 3: // api
-		matched, err := regexp.MatchString(`^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, "seafood")
+		matched, err := regexp.MatchString(`^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, identifier)
 		if err != nil {
 			return err
 		}
 		if !matched {
-			return errors.New("API id must be `^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
+			return errors.New("API identifier must be `^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
 		}
 	default:
-		return errors.New("unsupported id type")
+		return errors.New("unsupported identifier type")
 	}
 	return nil
 }
@@ -173,7 +185,7 @@ func AddResource(c *gin.Context) {
 		return
 	}
 	// 检查identifer的格式
-	if err := validateID(req.Type, req.ID); err != nil {
+	if err := validateIdentifier(req.Type, req.Identifier); err != nil {
 		c.JSON(http.StatusBadRequest, &web.Response{
 			Code: web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
@@ -183,7 +195,7 @@ func AddResource(c *gin.Context) {
 	// 调用服务
 	result, svcErr := resource.AddResource(
 		req.Type,
-		req.ID,
+		req.Identifier,
 		req.Name,
 		req.Intro,
 		req.Icon,
@@ -235,6 +247,14 @@ func EditResource(c *gin.Context) {
 		})
 		return
 	}
+	idN, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", "菜单/控件/API的id非整型数字"),
+		})
+		return
+	}
 	var req EditResourceReq
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, &web.Response{
@@ -245,7 +265,7 @@ func EditResource(c *gin.Context) {
 	}
 	// 调用服务
 	svcErr := resource.EditResource(
-		id,
+		idN,
 		req.Name,
 		req.Intro,
 		req.Icon,
@@ -295,8 +315,16 @@ func DeleteResource(c *gin.Context) {
 		})
 		return
 	}
+	idN, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", "菜单/控件/API的id非整型数字"),
+		})
+		return
+	}
 	// 调用服务
-	if svcErr := resource.DeleteResource(id); svcErr != nil {
+	if svcErr := resource.DeleteResource(idN); svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &web.Response{
 				Code: web.ResponseCode_InternalError,

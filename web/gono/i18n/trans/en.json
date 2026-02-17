@@ -5,8 +5,7 @@
       "user": "User",
       "domain": "Domain",
       "role": "Role",
-      "menu": "Menu",
-      "api": "API"
+      "resource": "Resource"
     },
     "btn": {
       "search": "Search",
@@ -93,12 +92,41 @@
       "header": "Edit Role"
     },
     "placeholder": {
-      "name": "Enter role name",
-      "intro": "Enter role introduction"
+      "name": "Enter role name"
     },
     "label": {
       "name": "Name",
       "id": "ID",
+      "intro": "Introduction",
+      "createdAt": "CreatedAt",
+      "updatedAt": "UpdatedAt",
+      "operation": "Operation"
+    }
+  },
+  "resource": {
+    "type": {
+      "menu": "Menu",
+      "widget": "Widget",
+      "api": "API"
+    },
+    "add": {
+      "header": "Add Resource"
+    },
+    "edit": {
+      "header": "Edit Resource"
+    },
+    "placeholder": {
+      "type": "Select a type",
+      "id": "Enter resource identifier",
+      "name": "Enter resource name",
+      "intro": "Enter resource introduction",
+      "icon": "Enter resource icon"
+    },
+    "label": {
+      "name": "Name",
+      "icon": "Icon",
+      "id": "Identifier",
+      "type": "Type",
       "intro": "Introduction",
       "createdAt": "CreatedAt",
       "updatedAt": "UpdatedAt",

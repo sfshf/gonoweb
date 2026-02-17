@@ -49,11 +49,11 @@ func FindMenuWidgetsByDomainAndRole(domain, role string) ([]TResource, error) {
 	return list, nil
 }
 
-func FirstByIdentifier(identifier string) (*TResource, error) {
+func FirstByID(id int64) (*TResource, error) {
 	var record TResource
 	if err := repo.GormDB.
 		Table(TableNameTResource).
-		Where("identifier=?", identifier).
+		Where("id=?", id).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -107,14 +107,14 @@ func ReliveByIdentifier(identifier string, m *TResource) error {
 	})
 }
 
-func UpdateByIdentifier(identifier string, m *TResource) error {
+func UpdateByID(id int64, m *TResource) error {
 	m.UpdatedAt = time.Now()
 	return repo.GormDB.
 		Table(TableNameTResource).
-		Where("identifier=?", identifier).
+		Where("id=?", id).
 		Updates(m).Error
 }
 
-func DeleteByIdentifier(identifier string) error {
-	return repo.GormDB.Delete(&TResource{}, "identifier=?", identifier).Error
+func DeleteByIdentifier(id int64) error {
+	return repo.GormDB.Delete(&TResource{}, "id=?", id).Error
 }

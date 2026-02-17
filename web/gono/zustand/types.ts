@@ -3,15 +3,15 @@ export type AuthStore = {
   user: TUser | null;
   domain: TDomain | null;
   role: TRole | null;
-  menus: TMenuWidget[] | null;
-  widgets: TMenuWidget[] | null;
+  menus: TResource[] | null;
+  widgets: TResource[] | null;
   setAuth: (
     token: string | null,
     user: TUser | null,
     domain: TDomain | null,
     role: TRole | null,
-    menus: TMenuWidget[] | null,
-    widgets: TMenuWidget[] | null
+    menus: TResource[] | null,
+    widgets: TResource[] | null,
   ) => void;
   clearAuth: () => void;
 };
@@ -49,7 +49,7 @@ export type TRole = {
   intro: string;
 };
 
-export type TMenuWidget = {
+export type TResource = {
   id: number;
   created_at: string;
   updated_at: string;

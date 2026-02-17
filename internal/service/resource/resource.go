@@ -28,8 +28,8 @@ func ListResource(page, pageSize int, wheres map[string][]any) ([]TResource, int
 	return list, total, nil
 }
 
-func ResourceInfo(id string) (*TResource, *SvcErr) {
-	domain, err := resource.FirstByIdentifier(id)
+func ResourceInfo(id int64) (*TResource, *SvcErr) {
+	domain, err := resource.FirstByID(id)
 	if err != nil {
 		return nil, &SvcErr{Internal: true, Err: err}
 	}
@@ -39,9 +39,9 @@ func ResourceInfo(id string) (*TResource, *SvcErr) {
 	return domain, nil
 }
 
-func AddResource(typ int32, id, name, intro, icon string) (*TResource, *SvcErr) {
+func AddResource(typ int32, identifier, name, intro, icon string) (*TResource, *SvcErr) {
 	// 搜索有没有重复的、删除的记录
-	mwa, err := resource.FirstUnscopedByIdentifier(id)
+	mwa, err := resource.FirstUnscopedByIdentifier(identifier)
 	if err != nil {
 		return nil, &SvcErr{Internal: true, Err: err}
 	}
@@ -49,7 +49,7 @@ func AddResource(typ int32, id, name, intro, icon string) (*TResource, *SvcErr) 
 		// 新增
 		mwa = &TResource{
 			Type:       typ,
-			Identifier: id,
+			Identifier: identifier,
 			Name:       name,
 			Intro:      intro,
 			Icon:       icon,
@@ -72,8 +72,8 @@ func AddResource(typ int32, id, name, intro, icon string) (*TResource, *SvcErr) 
 	return mwa, nil
 }
 
-func EditResource(id string, name, intro, icon string) *SvcErr {
-	if err := resource.UpdateByIdentifier(id, &TResource{
+func EditResource(id int64, name, intro, icon string) *SvcErr {
+	if err := resource.UpdateByID(id, &TResource{
 		Name:  name,
 		Intro: intro,
 	}); err != nil {
@@ -82,7 +82,7 @@ func EditResource(id string, name, intro, icon string) *SvcErr {
 	return nil
 }
 
-func DeleteResource(id string) *SvcErr {
+func DeleteResource(id int64) *SvcErr {
 	if err := resource.DeleteByIdentifier(id); err != nil {
 		return &SvcErr{Internal: true, Err: err}
 	}

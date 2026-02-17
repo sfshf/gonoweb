@@ -45,12 +45,8 @@ export const siteMenus = [
     href: "/role",
   },
   {
-    label: "menu",
-    href: "/menu",
-  },
-  {
-    label: "api",
-    href: "/api",
+    label: "resource",
+    href: "/resource",
   },
 ];
 
@@ -80,16 +76,8 @@ export const siteWidgets = {
   btn_update_role: "btn_update_role",
   btn_delete_role: "btn_delete_role",
   btn_search_role: "btn_search_role",
-  btn_add_menu: "btn_add_menu",
-  btn_update_menu: "btn_update_menu",
-  btn_delete_menu: "btn_delete_menu",
-  btn_search_menu: "btn_search_menu",
-  btn_add_widget: "btn_add_widget",
-  btn_update_widget: "btn_update_widget",
-  btn_delete_widget: "btn_delete_widget",
-  btn_search_widget: "btn_search_widget",
-  btn_add_api: "btn_add_api",
-  btn_update_api: "btn_update_api",
-  btn_delete_api: "btn_delete_api",
-  btn_search_api: "btn_search_api",
+  btn_add_resource: "btn_add_resource",
+  btn_update_resource: "btn_update_resource",
+  btn_delete_resource: "btn_delete_resource",
+  btn_search_resource: "btn_search_resource",
 };

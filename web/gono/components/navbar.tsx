@@ -33,7 +33,7 @@ import {
   addToast,
 } from "@heroui/react";
 import { signOut } from "@/api/user";
-import { AuthStore, TMenuWidget } from "@/zustand/types";
+import { AuthStore, TResource } from "@/zustand/types";
 import { User } from "@heroui/react";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
@@ -100,7 +100,7 @@ export const Navbar = () => {
         </NavbarBrand>
         <ul className='hidden lg:flex gap-4 justify-start ml-2'>
           {menus &&
-            menus.map((item: TMenuWidget) => {
+            menus.map((item: TResource) => {
               const menu = hasMenu(item.identifier);
               if (!menu) {
                 return <></>;
