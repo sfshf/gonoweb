@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-const TableNameTMenuWidgetAPI = "t_menu_widget_api"
+const TableNameTResource = "t_resource"
 
-// TMenuWidgetAPI mapped from table <t_menu_widget_api>
-type TMenuWidgetAPI struct {
+// TResource mapped from table <t_resource>
+type TResource struct {
 	ID         int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
 	CreatedAt  time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt  time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
@@ -23,7 +23,7 @@ type TMenuWidgetAPI struct {
 	Icon       string    `gorm:"column:icon" json:"icon"`
 }
 
-// TableName TMenuWidgetAPI's table name
-func (*TMenuWidgetAPI) TableName() string {
-	return TableNameTMenuWidgetAPI
+// TableName TResource's table name
+func (*TResource) TableName() string {
+	return TableNameTResource
 }

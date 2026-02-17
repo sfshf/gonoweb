@@ -1,4 +1,4 @@
-package casbin_repo
+package casbin
 
 import (
 	. "github.com/sfshf/gonoweb/internal/model"

@@ -6,9 +6,9 @@ import (
 
 	. "github.com/sfshf/gonoweb/internal/model"
 	"github.com/sfshf/gonoweb/internal/repo"
-	user_repo "github.com/sfshf/gonoweb/internal/repo/user"
+	"github.com/sfshf/gonoweb/internal/repo/user"
 	. "github.com/sfshf/gonoweb/internal/service"
-	jwt_util "github.com/sfshf/gonoweb/internal/util/jwt"
+	"github.com/sfshf/gonoweb/internal/util/jwt"
 )
 
 // 新建/更新用户的代理信息
@@ -26,9 +26,9 @@ func UpsertUserAgent(ip, ua, tid string, userInfo ...string) error {
 	// 如果uxid非空，则是在登录，否则只是访客行为
 	var record *TUserAgent
 	if uxid != "" {
-		record, err = user_repo.UserAgent_FirstUnscopedByXidAndIP(uxid, ip)
+		record, err = user.UserAgent_FirstUnscopedByXidAndIP(uxid, ip)
 	} else {
-		record, err = user_repo.UserAgent_FirstByIP(ip)
+		record, err = user.UserAgent_FirstByIP(ip)
 	}
 	if err != nil {
 		return err
@@ -48,7 +48,7 @@ func UpsertUserAgent(ip, ua, tid string, userInfo ...string) error {
 		// 如果uxid非空，则是在登录，否则只是访客行为
 		if uxid != "" {
 			// 登录，则激活之前的记录
-			if err := user_repo.UserAgent_ReliveByXidAndIP(uxid, ip, &TUserAgent{
+			if err := user.UserAgent_ReliveByXidAndIP(uxid, ip, &TUserAgent{
 				Ua:      ua,
 				TraceID: tid,
 				Token:   token,
@@ -57,7 +57,7 @@ func UpsertUserAgent(ip, ua, tid string, userInfo ...string) error {
 			}
 		} else {
 			// 访客，则更新访客信息
-			if err := user_repo.UserAgent_UpdateByIP(ip, &TUserAgent{
+			if err := user.UserAgent_UpdateByIP(ip, &TUserAgent{
 				Ua:      ua,
 				TraceID: tid,
 			}); err != nil {
@@ -70,8 +70,8 @@ func UpsertUserAgent(ip, ua, tid string, userInfo ...string) error {
 
 func CheckTokenWithIP(token, ip string) error {
 	err := errors.New("非法的登录token")
-	token = strings.TrimPrefix(token, jwt_util.BearerPrefix)
-	record, _ := user_repo.UserAgent_FirstByToken(token)
+	token = strings.TrimPrefix(token, jwt.BearerPrefix)
+	record, _ := user.UserAgent_FirstByToken(token)
 	if record == nil {
 		return err
 	}

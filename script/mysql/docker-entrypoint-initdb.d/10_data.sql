@@ -2,19 +2,15 @@
 SET character_set_client = utf8mb4;
 SET character_set_connection = utf8mb4;
 
--- `t_menu_widget_api` 菜单、控件、API表 起始数据；起始菜单数据只有超级管理员设置密码后能看到
-INSERT INTO `t_menu_widget_api` (`type`, `identifier`, `name`, `intro`, `icon`) 
+-- `t_resource` 菜单、控件、API表 起始数据；起始菜单数据只有超级管理员设置密码后能看到
+INSERT INTO `t_resource` (`type`, `identifier`, `name`, `intro`, `icon`) 
 VALUES (1, "/user", "user menu", "用户页", ""), -- 用户相关菜单
 
 (1, "/domain", "domain menu", "域租户页", ""), -- 域租户相关菜单
 
 (1, "/role", "role menu", "角色页", ""), -- 角色相关菜单
 
-(1, "/menu", "frontend menu", "前端菜单页", ""), -- 菜单相关菜单
-
-(1, "/widget", "frontend widget", "前端控件页", ""), -- 控件相关菜单
-
-(1, "/api", "backend api", "后端API页", ""), -- API相关菜单
+(1, "/resource", "menu/widget/api menu", "资源（菜单/控件/API）页", ""), -- 资源（菜单/控件/API）相关菜单
 
 (2, "btn_add_user", "add user button", "新增用户按钮", ""),  -- 用户相关控件
 (2, "btn_update_user", "update user button", "更新用户按钮", ""),
@@ -31,20 +27,10 @@ VALUES (1, "/user", "user menu", "用户页", ""), -- 用户相关菜单
 (2, "btn_delete_role", "delete role button", "删除角色按钮", ""),
 (2, "btn_search_role", "search role button", "搜索角色按钮", ""),
 
-(2, "btn_add_menu", "add menu button", "新增菜单按钮", ""),    -- 菜单相关控件
-(2, "btn_update_menu", "update menu button", "更新菜单按钮", ""),
-(2, "btn_delete_menu", "delete menu button", "删除菜单按钮", ""),
-(2, "btn_search_menu", "search menu button", "搜索菜单按钮", ""),
-
-(2, "btn_add_widget", "add widget button", "新增控件按钮", ""),    -- 控件相关控件
-(2, "btn_update_widget", "update widget button", "更新控件按钮", ""),
-(2, "btn_delete_widget", "delete widget button", "删除控件按钮", ""),
-(2, "btn_search_widget", "search widget button", "搜索控件按钮", ""),
-
-(2, "btn_add_api", "add api button", "新增API按钮", ""),    -- API相关控件
-(2, "btn_update_api", "update api button", "更新API按钮", ""),
-(2, "btn_delete_api", "delete api button", "删除API按钮", ""),
-(2, "btn_search_api", "search api button", "搜索API按钮", ""),
+(2, "btn_add_resource", "add resouce button", "新增资源（菜单/控件/API）按钮", ""),    -- 资源（菜单/控件/API）相关控件
+(2, "btn_update_resource", "update resouce button", "更新资源（菜单/控件/API）按钮", ""),
+(2, "btn_delete_resource", "delete resouce button", "删除资源（菜单/控件/API）按钮", ""),
+(2, "btn_search_resource", "search resouce button", "搜索资源（菜单/控件/API）按钮", ""),
 
 (3, "GET /api/v1/ping", "ping", "PING接口", ""),  -- ping 接口
 
@@ -69,20 +55,8 @@ VALUES (1, "/user", "user menu", "用户页", ""), -- 用户相关菜单
 (3, "PUT /api/v1/role/:xid", "update role api", "更新角色信息", ""),
 (3, "DELETE /api/v1/role/:xid", "delete role api", "删除角色", ""),
 
-(3, "POST /api/v1/menu", "add menu api", "新增菜单", ""),  -- 菜单相关API
-(3, "GET /api/v1/menu", "get menu list api", "获取菜单列表", ""),
-(3, "GET /api/v1/menu/:xid", "get menu api", "获取菜单信息", ""),
-(3, "PUT /api/v1/menu/:xid", "update menu api", "更新菜单信息", ""),
-(3, "DELETE /api/v1/menu/:xid", "delete menu api", "删除菜单", ""),
-
-(3, "POST /api/v1/widget", "add widget api", "新增控件", ""),  -- 控件相关API
-(3, "GET /api/v1/widget", "get widget list api", "获取控件列表", ""),
-(3, "GET /api/v1/widget/:xid", "get widget api", "获取控件信息", ""),
-(3, "PUT /api/v1/widget/:xid", "update widget api", "更新控件信息", ""),
-(3, "DELETE /api/v1/widget/:xid", "delete widget api", "删除控件", ""),
-
-(3, "POST /api/v1/api", "add api api", "新增API", ""),  -- API相关API
-(3, "GET /api/v1/api", "get api list api", "获取API列表", ""),
-(3, "GET /api/v1/api/:xid", "get api api", "获取API信息", ""),
-(3, "PUT /api/v1/api/:xid", "update api api", "更新API信息", ""),
-(3, "DELETE /api/v1/api/:xid", "delete api api", "删除API", "");
+(3, "POST /api/v1/resource", "add resource api", "新增资源（菜单/控件/API）", ""),  -- 资源（菜单/控件/API）相关相关API
+(3, "GET /api/v1/resource", "get resource list api", "获取资源（菜单/控件/API）列表", ""),
+(3, "GET /api/v1/resource/:id", "get resource api", "获取资源（菜单/控件/API）信息", ""),
+(3, "PUT /api/v1/resource/:id", "update resource api", "更新资源（菜单/控件/API）信息", ""),
+(3, "DELETE /api/v1/resource/:id", "delete resource api", "删除资源（菜单/控件/API）", "");

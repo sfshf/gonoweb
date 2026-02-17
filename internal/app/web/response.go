@@ -1,4 +1,4 @@
-package gono_web
+package web
 
 const (
 	ResponseCode_RequestError  = -2

@@ -6,7 +6,7 @@ import (
 	"github.com/rs/xid"
 	. "github.com/sfshf/gonoweb/internal/model"
 	"github.com/sfshf/gonoweb/internal/repo"
-	role_repo "github.com/sfshf/gonoweb/internal/repo/role"
+	role "github.com/sfshf/gonoweb/internal/repo/role"
 	. "github.com/sfshf/gonoweb/internal/service"
 )
 
@@ -30,7 +30,7 @@ func ListRole(page, pageSize int, wheres map[string][]any) ([]TRole, int64, *Svc
 }
 
 func RoleInfo(xid string) (*TRole, *SvcErr) {
-	role, err := role_repo.FirstByXid(xid)
+	role, err := role.FirstByXid(xid)
 	if err != nil {
 		return nil, &SvcErr{Internal: true, Err: err}
 	}
@@ -42,11 +42,11 @@ func RoleInfo(xid string) (*TRole, *SvcErr) {
 
 func AddRole(name, intro string) (*TRole, *SvcErr) {
 	// 搜索有没有重复的、删除的记录
-	role, err := role_repo.FirstUnscopedByName(name)
+	roleM, err := role.FirstUnscopedByName(name)
 	if err != nil {
 		return nil, &SvcErr{Internal: true, Err: err}
 	}
-	if role == nil {
+	if roleM == nil {
 		// 新增
 		role := &TRole{
 			Xid:   xid.New().String(),
@@ -58,21 +58,21 @@ func AddRole(name, intro string) (*TRole, *SvcErr) {
 		}
 	} else {
 		// 如果是活角色则报错
-		if role.DeletedAt == 0 {
+		if roleM.DeletedAt == 0 {
 			return nil, &SvcErr{Err: fmt.Errorf("角色[name=%s]已存在", name)}
 		}
 		// 如果是死角色则激活
-		if err := role_repo.ReliveByXid(role.Xid, &TRole{
+		if err := role.ReliveByXid(roleM.Xid, &TRole{
 			Intro: intro,
 		}); err != nil {
 			return nil, &SvcErr{Internal: true, Err: err}
 		}
 	}
-	return role, nil
+	return roleM, nil
 }
 
 func EditRole(xid, name, intro string) *SvcErr {
-	if err := role_repo.UpdateByXid(xid, &TRole{
+	if err := role.UpdateByXid(xid, &TRole{
 		Name:  name,
 		Intro: intro,
 	}); err != nil {
@@ -82,7 +82,7 @@ func EditRole(xid, name, intro string) *SvcErr {
 }
 
 func DeleteRole(xid string) *SvcErr {
-	if err := role_repo.DeleteByXid(xid); err != nil {
+	if err := role.DeleteByXid(xid); err != nil {
 		return &SvcErr{Internal: true, Err: err}
 	}
 	return nil

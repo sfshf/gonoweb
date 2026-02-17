@@ -10,8 +10,8 @@ import (
 	"github.com/sfshf/gonoweb/internal/app/web/ginsrv"
 	"github.com/sfshf/gonoweb/internal/config"
 	"github.com/sfshf/gonoweb/internal/repo"
-	casbin_svc "github.com/sfshf/gonoweb/internal/service/casbin"
-	user_svc "github.com/sfshf/gonoweb/internal/service/user"
+	"github.com/sfshf/gonoweb/internal/service/casbin"
+	"github.com/sfshf/gonoweb/internal/service/user"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,13 +30,13 @@ func TestSignInOut(t *testing.T) {
 	}
 	// 初始化前置服务
 	//   - 初始化root账号
-	clear, err := user_svc.Launch()
+	clear, err := user.Launch()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer clear()
 	//   - casbin service
-	clear, err = casbin_svc.Launch()
+	clear, err = casbin.Launch()
 	if err != nil {
 		t.Fatal(err)
 	}

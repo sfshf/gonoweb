@@ -9,7 +9,7 @@ import (
 	"github.com/sfshf/gonoweb/internal/app/web/ginsrv"
 	"github.com/sfshf/gonoweb/internal/config"
 	"github.com/sfshf/gonoweb/internal/repo"
-	user_svc "github.com/sfshf/gonoweb/internal/service/user"
+	"github.com/sfshf/gonoweb/internal/service/user"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +24,7 @@ func TestVisit(t *testing.T) {
 	}
 	// 初始化前置服务
 	//   - 初始化root账号
-	clear, err := user_svc.Launch()
+	clear, err := user.Launch()
 	if err != nil {
 		t.Fatal(err)
 	}

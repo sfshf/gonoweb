@@ -13,7 +13,7 @@ definitions:
       created_at:
         type: string
       deleted_at:
-        $ref: '#/definitions/gorm.DeletedAt'
+        type: integer
       id:
         type: integer
       intro:
@@ -25,12 +25,12 @@ definitions:
       xid:
         type: string
     type: object
-  github_com_sfshf_gonoweb_internal_model.TMenuWidgetAPI:
+  github_com_sfshf_gonoweb_internal_model.TResource:
     properties:
       created_at:
         type: string
       deleted_at:
-        $ref: '#/definitions/gorm.DeletedAt'
+        type: integer
       icon:
         type: string
       id:
@@ -51,7 +51,7 @@ definitions:
       created_at:
         type: string
       deleted_at:
-        $ref: '#/definitions/gorm.DeletedAt'
+        type: integer
       id:
         type: integer
       intro:
@@ -65,10 +65,12 @@ definitions:
     type: object
   github_com_sfshf_gonoweb_internal_model.TUser:
     properties:
+      avatar:
+        type: string
       created_at:
         type: string
       deleted_at:
-        $ref: '#/definitions/gorm.DeletedAt'
+        type: integer
       email:
         type: string
       id:
@@ -89,7 +91,7 @@ definitions:
       created_at:
         type: string
       deleted_at:
-        $ref: '#/definitions/gorm.DeletedAt'
+        type: integer
       id:
         type: integer
       ip:
@@ -111,7 +113,7 @@ definitions:
         $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TDomain'
       menus:
         items:
-          $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TMenuWidgetAPI'
+          $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TResource'
         type: array
       role:
         $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TRole'
@@ -121,16 +123,8 @@ definitions:
         $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TUser'
       widgets:
         items:
-          $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TMenuWidgetAPI'
+          $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TResource'
         type: array
-    type: object
-  gorm.DeletedAt:
-    properties:
-      time:
-        type: string
-      valid:
-        description: Valid is true if Time is not NULL
-        type: boolean
     type: object
   internal_app_web_ginsrv_domain.AddDomainReq:
     properties:
@@ -151,6 +145,41 @@ definitions:
       list:
         items:
           $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TDomain'
+        type: array
+      total:
+        type: integer
+    type: object
+  internal_app_web_ginsrv_resource.AddResourceReq:
+    properties:
+      icon:
+        type: string
+      id:
+        type: string
+      intro:
+        type: string
+      name:
+        type: string
+      type:
+        enum:
+        - 1
+        - 2
+        - 3
+        type: integer
+    type: object
+  internal_app_web_ginsrv_resource.EditResourceReq:
+    properties:
+      icon:
+        type: string
+      intro:
+        type: string
+      name:
+        type: string
+    type: object
+  internal_app_web_ginsrv_resource.ListResourceResp:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TResource'
         type: array
       total:
         type: integer
@@ -182,15 +211,21 @@ definitions:
     properties:
       email:
         type: string
-      password:
+      nickname:
         type: string
+    required:
+    - email
+    - nickname
     type: object
   internal_app_web_ginsrv_user.EditUserReq:
     properties:
+      email:
+        type: string
       nickName:
         type: string
-      realName:
-        type: string
+    required:
+    - email
+    - nickName
     type: object
   internal_app_web_ginsrv_user.ListUserAgentResp:
     properties:
@@ -212,11 +247,12 @@ definitions:
     type: object
   internal_app_web_ginsrv_user.SignInReq:
     properties:
-      email:
+      account:
         type: string
       password:
         type: string
     required:
+    - account
     - password
     type: object
 externalDocs:
@@ -247,11 +283,14 @@ paths:
         name: Authorization
         type: string
       - in: query
+        name: name
+        type: string
+      - in: query
         name: page
         type: integer
       - in: query
         maximum: 20
-        minimum: 5
+        minimum: 2
         name: pageSize
         type: integer
       produces:
@@ -438,6 +477,199 @@ paths:
       summary: 测试服务路由
       tags:
       - 测试
+  /resource:
+    get:
+      consumes:
+      - text/plain
+      description: 获取菜单/控件/API列表
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - in: query
+        name: id
+        type: string
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        maximum: 20
+        minimum: 2
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_web_ginsrv_resource.ListResourceResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 获取菜单/控件/API列表
+      tags:
+      - 菜单/控件/API
+    post:
+      consumes:
+      - application/json
+      description: 新增菜单/控件/API
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 菜单/控件/API信息
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_app_web_ginsrv_resource.AddResourceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TResource'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 新增菜单/控件/API
+      tags:
+      - 菜单/控件/API
+  /resource/:id:
+    delete:
+      consumes:
+      - application/json
+      description: 删除菜单/控件/API
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 菜单/控件/API的id
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 删除菜单/控件/API
+      tags:
+      - 菜单/控件/API
+    get:
+      consumes:
+      - text/plain
+      description: 获取菜单/控件/API信息
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 菜单/控件/API的id
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TResource'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 获取菜单/控件/API信息
+      tags:
+      - 菜单/控件/API
+    put:
+      consumes:
+      - application/json
+      description: 编辑菜单/控件/API
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 菜单/控件/API的id
+        in: path
+        name: id
+        type: string
+      - description: 菜单/控件/API信息
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_app_web_ginsrv_resource.EditResourceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 编辑菜单/控件/API
+      tags:
+      - 菜单/控件/API
   /role:
     get:
       consumes:
@@ -449,11 +681,14 @@ paths:
         name: Authorization
         type: string
       - in: query
+        name: name
+        type: string
+      - in: query
         name: page
         type: integer
       - in: query
         maximum: 20
-        minimum: 5
+        minimum: 2
         name: pageSize
         type: integer
       produces:
@@ -636,13 +871,22 @@ paths:
         name: Authorization
         type: string
       - in: query
+        name: email
+        type: string
+      - in: query
+        name: nickname
+        type: string
+      - in: query
         name: page
         type: integer
       - in: query
         maximum: 20
-        minimum: 5
+        minimum: 2
         name: pageSize
         type: integer
+      - in: query
+        name: realname
+        type: string
       produces:
       - application/json
       responses:
@@ -827,7 +1071,7 @@ paths:
         type: integer
       - in: query
         maximum: 20
-        minimum: 5
+        minimum: 2
         name: pageSize
         type: integer
       produces:

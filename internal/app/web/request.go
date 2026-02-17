@@ -1,4 +1,4 @@
-package gono_web
+package web
 
 type Pagination struct {
 	Page     int `json:"page" form:"page" binding:"gt=0"`

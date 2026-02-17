@@ -1,4 +1,4 @@
-package role_repo
+package role
 
 import (
 	"time"

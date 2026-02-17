@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	gono_web "github.com/sfshf/gonoweb/internal/app/web"
-	ginmw "github.com/sfshf/gonoweb/internal/app/web/ginsrv/middlewares"
-	user_svc "github.com/sfshf/gonoweb/internal/service/user"
+	"github.com/sfshf/gonoweb/internal/app/web"
+	"github.com/sfshf/gonoweb/internal/app/web/ginsrv/middlewares"
+	"github.com/sfshf/gonoweb/internal/service/user"
 )
 
 // Visit 首次访问
@@ -16,10 +16,10 @@ import (
 // @Tags         用户
 // @Accept       plain
 // @Produce      json
-// @Success      200  {object}  gono_web.Response
-// @Failure      400  {object}  gono_web.Response
-// @Failure      404  {object}  gono_web.Response
-// @Failure      500  {object}  gono_web.Response
+// @Success      200  {object}  web.Response
+// @Failure      400  {object}  web.Response
+// @Failure      404  {object}  web.Response
+// @Failure      500  {object}  web.Response
 // @Router       /user/visit [POST]
 func Visit(c *gin.Context) {
 	// IP  from HTTP headers
@@ -27,20 +27,20 @@ func Visit(c *gin.Context) {
 	// User-Agent from HTTP headers
 	ua := c.GetHeader("User-Agent")
 	// TracdID from HTTP headers
-	tid := c.GetHeader(ginmw.HeaderKey_TraceID)
+	tid := c.GetHeader(middlewares.HeaderKey_TraceID)
 	if tid == "" {
-		tid = c.GetString(ginmw.HeaderKey_TraceID)
+		tid = c.GetString(middlewares.HeaderKey_TraceID)
 	}
-	if err := user_svc.UpsertUserAgent(ip, ua, tid); err != nil {
-		c.JSON(http.StatusInternalServerError, &gono_web.Response{
-			Code: gono_web.ResponseCode_InternalError,
+	if err := user.UpsertUserAgent(ip, ua, tid); err != nil {
+		c.JSON(http.StatusInternalServerError, &web.Response{
+			Code: web.ResponseCode_InternalError,
 			Msg:  fmt.Sprintf("新增/更新用户代理信息失败：%s", err.Error()),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, &gono_web.Response{
-		Code: gono_web.ResponseCode_OK,
-		Msg:  gono_web.ResponseMsg_OK,
+	c.JSON(http.StatusOK, &web.Response{
+		Code: web.ResponseCode_OK,
+		Msg:  web.ResponseMsg_OK,
 	})
 }
 
@@ -53,41 +53,41 @@ func Visit(c *gin.Context) {
 // @Param        Authorization header string false "登录token"
 // @Param        request query ListUserAgentReq false "列表搜索条件"
 // @Success      200  {object}  ListUserAgentResp
-// @Failure      400  {object}  gono_web.Response
-// @Failure      404  {object}  gono_web.Response
-// @Failure      500  {object}  gono_web.Response
+// @Failure      400  {object}  web.Response
+// @Failure      404  {object}  web.Response
+// @Failure      500  {object}  web.Response
 // @Router       /user/agent [GET]
 func ListUserAgent(c *gin.Context) {
 	// 检查入参
 	var req ListUserAgentReq
 	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, &gono_web.Response{
-			Code: gono_web.ResponseCode_RequestError,
+		c.JSON(http.StatusBadRequest, &web.Response{
+			Code: web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
 		})
 		return
 	}
 	// 调用服务
-	list, total, svcErr := user_svc.ListUserAgent(req.Page, req.PageSize)
+	list, total, svcErr := user.ListUserAgent(req.Page, req.PageSize)
 	if svcErr != nil {
 		if svcErr.Internal {
-			c.JSON(http.StatusInternalServerError, &gono_web.Response{
-				Code: gono_web.ResponseCode_InternalError,
+			c.JSON(http.StatusInternalServerError, &web.Response{
+				Code: web.ResponseCode_InternalError,
 				Msg:  fmt.Sprintf("系统报错：%s", svcErr.Error()),
 			})
 			return
 		} else {
-			c.JSON(http.StatusBadRequest, &gono_web.Response{
-				Code: gono_web.ResponseCode_RequestError,
+			c.JSON(http.StatusBadRequest, &web.Response{
+				Code: web.ResponseCode_RequestError,
 				Msg:  fmt.Sprintf("获取列表失败：%s", svcErr.Error()),
 			})
 			return
 		}
 	}
 	// 返回结果
-	c.JSON(http.StatusOK, &gono_web.Response{
-		Code: gono_web.ResponseCode_OK,
-		Msg:  gono_web.ResponseMsg_OK,
+	c.JSON(http.StatusOK, &web.Response{
+		Code: web.ResponseCode_OK,
+		Msg:  web.ResponseMsg_OK,
 		Data: &ListUserAgentResp{
 			List:  list,
 			Total: total,

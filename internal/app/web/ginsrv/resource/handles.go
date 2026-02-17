@@ -1,30 +1,32 @@
-package role
+package resource
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sfshf/gonoweb/internal/app/web"
-	"github.com/sfshf/gonoweb/internal/service/role"
+	"github.com/sfshf/gonoweb/internal/service/resource"
 )
 
-// ListRole 获取角色列表
-// @Summary      获取角色列表
-// @Description  获取角色列表
-// @Tags         角色
+// ListResource 获取菜单/控件/API列表
+// @Summary      获取菜单/控件/API列表
+// @Description  获取菜单/控件/API列表
+// @Tags         菜单/控件/API
 // @Accept       plain
 // @Produce      json
 // @Param        Authorization header string false "登录token"
-// @Param        request query ListRoleReq false "列表搜索条件"
-// @Success      200  {object}  ListRoleResp
+// @Param        request query ListResourceReq false "列表搜索条件"
+// @Success      200  {object}  ListResourceResp
 // @Failure      400  {object}  web.Response
 // @Failure      404  {object}  web.Response
 // @Failure      500  {object}  web.Response
-// @Router       /role [GET]
-func ListRole(c *gin.Context) {
+// @Router       /resource [GET]
+func ListResource(c *gin.Context) {
 	// 检查入参
-	var req ListRoleReq
+	var req ListResourceReq
 	if err := c.ShouldBindQuery(&req); err != nil {
 		c.JSON(http.StatusBadRequest, &web.Response{
 			Code: web.ResponseCode_RequestError,
@@ -33,11 +35,14 @@ func ListRole(c *gin.Context) {
 		return
 	}
 	wheres := make(map[string][]any)
+	if req.ID != "" {
+		wheres["identifier=?"] = []any{req.ID}
+	}
 	if req.Name != "" {
 		wheres["name LIKE ?"] = []any{"%" + req.Name + "%"}
 	}
 	// 调用服务
-	list, total, svcErr := role.ListRole(req.Page, req.PageSize, wheres)
+	list, total, svcErr := resource.ListResource(req.Page, req.PageSize, wheres)
 	if svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &web.Response{
@@ -57,38 +62,38 @@ func ListRole(c *gin.Context) {
 	c.JSON(http.StatusOK, &web.Response{
 		Code: web.ResponseCode_OK,
 		Msg:  web.ResponseMsg_OK,
-		Data: &ListRoleResp{
+		Data: &ListResourceResp{
 			List:  list,
 			Total: total,
 		},
 	})
 }
 
-// RoleInfo 获取角色信息
-// @Summary      获取角色信息
-// @Description  获取角色信息
-// @Tags         角色
+// ResourceInfo 获取菜单/控件/API信息
+// @Summary      获取菜单/控件/API信息
+// @Description  获取菜单/控件/API信息
+// @Tags         菜单/控件/API
 // @Accept       plain
 // @Produce      json
 // @Param        Authorization header string false "登录token"
-// @Param        xid path string false "角色xid"
-// @Success      200  {object}  github_com_sfshf_gonoweb_internal_model.TRole
+// @Param        id path string false "菜单/控件/API的id"
+// @Success      200  {object}  github_com_sfshf_gonoweb_internal_model.TResource
 // @Failure      400  {object}  web.Response
 // @Failure      404  {object}  web.Response
 // @Failure      500  {object}  web.Response
-// @Router       /role/:xid [GET]
-func RoleInfo(c *gin.Context) {
+// @Router       /resource/:id [GET]
+func ResourceInfo(c *gin.Context) {
 	// 检查入参
-	xid := c.Param("xid")
-	if xid == "" {
+	id := c.Param("id")
+	if id == "" {
 		c.JSON(http.StatusBadRequest, &web.Response{
 			Code: web.ResponseCode_RequestError,
-			Msg:  fmt.Sprintf("请求参数错误：%s", "角色xid为空"),
+			Msg:  fmt.Sprintf("请求参数错误：%s", "菜单/控件/API的id为空"),
 		})
 		return
 	}
 	// 调用服务
-	result, svcErr := role.RoleInfo(xid)
+	result, svcErr := resource.ResourceInfo(id)
 	if svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &web.Response{
@@ -112,22 +117,54 @@ func RoleInfo(c *gin.Context) {
 	})
 }
 
-// AddRole 新增角色
-// @Summary      新增角色
-// @Description  新增角色
-// @Tags         角色
+func validateID(typ int32, id string) error {
+	switch typ {
+	case 1: // menu
+		matched, err := regexp.MatchString(`^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, id)
+		if err != nil {
+			return err
+		}
+		if !matched {
+			return errors.New("menu id must be `^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
+		}
+	case 2: // widget
+		matched, err := regexp.MatchString(`^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`, id)
+		if err != nil {
+			return err
+		}
+		if !matched {
+			return errors.New("widget id must be `^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`")
+		}
+	case 3: // api
+		matched, err := regexp.MatchString(`^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, "seafood")
+		if err != nil {
+			return err
+		}
+		if !matched {
+			return errors.New("API id must be `^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
+		}
+	default:
+		return errors.New("unsupported id type")
+	}
+	return nil
+}
+
+// AddResource 新增菜单/控件/API
+// @Summary      新增菜单/控件/API
+// @Description  新增菜单/控件/API
+// @Tags         菜单/控件/API
 // @Accept       json
 // @Produce      json
 // @Param        Authorization header string false "登录token"
-// @Param        request body AddRoleReq false "角色信息"
-// @Success      200  {object}  github_com_sfshf_gonoweb_internal_model.TRole
+// @Param        request body AddResourceReq false "菜单/控件/API信息"
+// @Success      200  {object}  github_com_sfshf_gonoweb_internal_model.TResource
 // @Failure      400  {object}  web.Response
 // @Failure      404  {object}  web.Response
 // @Failure      500  {object}  web.Response
-// @Router       /role [POST]
-func AddRole(c *gin.Context) {
+// @Router       /resource [POST]
+func AddResource(c *gin.Context) {
 	// 检查入参
-	var req AddRoleReq
+	var req AddResourceReq
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, &web.Response{
 			Code: web.ResponseCode_RequestError,
@@ -135,8 +172,22 @@ func AddRole(c *gin.Context) {
 		})
 		return
 	}
+	// 检查identifer的格式
+	if err := validateID(req.Type, req.ID); err != nil {
+		c.JSON(http.StatusBadRequest, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
+		})
+		return
+	}
 	// 调用服务
-	result, svcErr := role.AddRole(req.Name, req.Intro)
+	result, svcErr := resource.AddResource(
+		req.Type,
+		req.ID,
+		req.Name,
+		req.Intro,
+		req.Icon,
+	)
 	if svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &web.Response{
@@ -160,31 +211,31 @@ func AddRole(c *gin.Context) {
 	})
 }
 
-// EditRole 编辑角色
-// @Summary      编辑角色
-// @Description  编辑角色
-// @Tags         角色
+// EditResource 编辑菜单/控件/API
+// @Summary      编辑菜单/控件/API
+// @Description  编辑菜单/控件/API
+// @Tags         菜单/控件/API
 // @Accept       json
 // @Produce      json
 // @Param        Authorization header string false "登录token"
-// @Param        xid path string false "角色xid"
-// @Param        request body EditRoleReq false "角色信息"
+// @Param        id path string false "菜单/控件/API的id"
+// @Param        request body EditResourceReq false "菜单/控件/API信息"
 // @Success      200  {object}  web.Response
 // @Failure      400  {object}  web.Response
 // @Failure      404  {object}  web.Response
 // @Failure      500  {object}  web.Response
-// @Router       /role/:xid [PUT]
-func EditRole(c *gin.Context) {
+// @Router       /resource/:id [PUT]
+func EditResource(c *gin.Context) {
 	// 检查入参
-	xid := c.Param("xid")
-	if xid == "" {
+	id := c.Param("id")
+	if id == "" {
 		c.JSON(http.StatusBadRequest, &web.Response{
 			Code: web.ResponseCode_RequestError,
-			Msg:  fmt.Sprintf("请求参数错误：%s", "角色xid为空"),
+			Msg:  fmt.Sprintf("请求参数错误：%s", "菜单/控件/API的id为空"),
 		})
 		return
 	}
-	var req EditRoleReq
+	var req EditResourceReq
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, &web.Response{
 			Code: web.ResponseCode_RequestError,
@@ -193,7 +244,12 @@ func EditRole(c *gin.Context) {
 		return
 	}
 	// 调用服务
-	svcErr := role.EditRole(xid, req.Name, req.Intro)
+	svcErr := resource.EditResource(
+		id,
+		req.Name,
+		req.Intro,
+		req.Icon,
+	)
 	if svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &web.Response{
@@ -216,31 +272,31 @@ func EditRole(c *gin.Context) {
 	})
 }
 
-// DeleteRole 删除角色
-// @Summary      删除角色
-// @Description  删除角色
-// @Tags         角色
+// DeleteResource 删除菜单/控件/API
+// @Summary      删除菜单/控件/API
+// @Description  删除菜单/控件/API
+// @Tags         菜单/控件/API
 // @Accept       json
 // @Produce      json
 // @Param        Authorization header string false "登录token"
-// @Param        xid path string false "角色xid"
+// @Param        id path string false "菜单/控件/API的id"
 // @Success      200  {object}  web.Response
 // @Failure      400  {object}  web.Response
 // @Failure      404  {object}  web.Response
 // @Failure      500  {object}  web.Response
-// @Router       /role/:xid [DELETE]
-func DeleteRole(c *gin.Context) {
+// @Router       /resource/:id [DELETE]
+func DeleteResource(c *gin.Context) {
 	// 检查入参
-	xid := c.Param("xid")
-	if xid == "" {
+	id := c.Param("id")
+	if id == "" {
 		c.JSON(http.StatusBadRequest, &web.Response{
 			Code: web.ResponseCode_RequestError,
-			Msg:  fmt.Sprintf("请求参数错误：%s", "角色xid为空"),
+			Msg:  fmt.Sprintf("请求参数错误：%s", "菜单/控件/API的id为空"),
 		})
 		return
 	}
 	// 调用服务
-	if svcErr := role.DeleteRole(xid); svcErr != nil {
+	if svcErr := resource.DeleteResource(id); svcErr != nil {
 		if svcErr.Internal {
 			c.JSON(http.StatusInternalServerError, &web.Response{
 				Code: web.ResponseCode_InternalError,

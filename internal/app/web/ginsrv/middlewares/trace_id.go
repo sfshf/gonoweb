@@ -1,4 +1,4 @@
-package ginmw
+package middlewares
 
 import (
 	"fmt"

@@ -44,9 +44,9 @@ CREATE TABLE `t_role` (
   CONSTRAINT uk_name UNIQUE (name, deleted_at)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- `t_menu_widget_api` 菜单、控件、API表
+-- `t_resource` 资源（菜单、控件、API）表
 
-CREATE TABLE `t_menu_widget_api` (
+CREATE TABLE `t_resource` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,

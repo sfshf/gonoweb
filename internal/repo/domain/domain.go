@@ -1,4 +1,4 @@
-package domain_repo
+package domain
 
 import (
 	"time"

@@ -45,13 +45,18 @@ const docTemplate = `{
                         "in": "header"
                     },
                     {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "name": "page",
                         "in": "query"
                     },
                     {
                         "maximum": 20,
-                        "minimum": 5,
+                        "minimum": 2,
                         "type": "integer",
                         "name": "pageSize",
                         "in": "query"
@@ -332,6 +337,301 @@ const docTemplate = `{
                 }
             }
         },
+        "/resource": {
+            "get": {
+                "description": "获取菜单/控件/API列表",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "菜单/控件/API"
+                ],
+                "summary": "获取菜单/控件/API列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 20,
+                        "minimum": 2,
+                        "type": "integer",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_app_web_ginsrv_resource.ListResourceResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "新增菜单/控件/API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "菜单/控件/API"
+                ],
+                "summary": "新增菜单/控件/API",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "description": "菜单/控件/API信息",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/internal_app_web_ginsrv_resource.AddResourceReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_model.TResource"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/resource/:id": {
+            "get": {
+                "description": "获取菜单/控件/API信息",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "菜单/控件/API"
+                ],
+                "summary": "获取菜单/控件/API信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "菜单/控件/API的id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_model.TResource"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "编辑菜单/控件/API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "菜单/控件/API"
+                ],
+                "summary": "编辑菜单/控件/API",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "菜单/控件/API的id",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "菜单/控件/API信息",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/internal_app_web_ginsrv_resource.EditResourceReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除菜单/控件/API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "菜单/控件/API"
+                ],
+                "summary": "删除菜单/控件/API",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "菜单/控件/API的id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/role": {
             "get": {
                 "description": "获取角色列表",
@@ -353,13 +653,18 @@ const docTemplate = `{
                         "in": "header"
                     },
                     {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "name": "page",
                         "in": "query"
                     },
                     {
                         "maximum": 20,
-                        "minimum": 5,
+                        "minimum": 2,
                         "type": "integer",
                         "name": "pageSize",
                         "in": "query"
@@ -638,15 +943,30 @@ const docTemplate = `{
                         "in": "header"
                     },
                     {
+                        "type": "string",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "nickname",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "name": "page",
                         "in": "query"
                     },
                     {
                         "maximum": 20,
-                        "minimum": 5,
+                        "minimum": 2,
                         "type": "integer",
                         "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "realname",
                         "in": "query"
                     }
                 ],
@@ -929,7 +1249,7 @@ const docTemplate = `{
                     },
                     {
                         "maximum": 20,
-                        "minimum": 5,
+                        "minimum": 2,
                         "type": "integer",
                         "name": "pageSize",
                         "in": "query"
@@ -1126,7 +1446,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "deleted_at": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -1145,14 +1465,14 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sfshf_gonoweb_internal_model.TMenuWidgetAPI": {
+        "github_com_sfshf_gonoweb_internal_model.TResource": {
             "type": "object",
             "properties": {
                 "created_at": {
                     "type": "string"
                 },
                 "deleted_at": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
+                    "type": "integer"
                 },
                 "icon": {
                     "type": "string"
@@ -1184,7 +1504,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "deleted_at": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -1206,11 +1526,14 @@ const docTemplate = `{
         "github_com_sfshf_gonoweb_internal_model.TUser": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
                 "deleted_at": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
+                    "type": "integer"
                 },
                 "email": {
                     "type": "string"
@@ -1242,7 +1565,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "deleted_at": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -1276,7 +1599,7 @@ const docTemplate = `{
                 "menus": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_model.TMenuWidgetAPI"
+                        "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_model.TResource"
                     }
                 },
                 "role": {
@@ -1291,20 +1614,8 @@ const docTemplate = `{
                 "widgets": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_model.TMenuWidgetAPI"
+                        "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_model.TResource"
                     }
-                }
-            }
-        },
-        "gorm.DeletedAt": {
-            "type": "object",
-            "properties": {
-                "time": {
-                    "type": "string"
-                },
-                "valid": {
-                    "description": "Valid is true if Time is not NULL",
-                    "type": "boolean"
                 }
             }
         },
@@ -1337,6 +1648,59 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_model.TDomain"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_app_web_ginsrv_resource.AddResourceReq": {
+            "type": "object",
+            "properties": {
+                "icon": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "intro": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2,
+                        3
+                    ]
+                }
+            }
+        },
+        "internal_app_web_ginsrv_resource.EditResourceReq": {
+            "type": "object",
+            "properties": {
+                "icon": {
+                    "type": "string"
+                },
+                "intro": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_app_web_ginsrv_resource.ListResourceResp": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_model.TResource"
                     }
                 },
                 "total": {
@@ -1382,22 +1746,30 @@ const docTemplate = `{
         },
         "internal_app_web_ginsrv_user.AddUserReq": {
             "type": "object",
+            "required": [
+                "email",
+                "nickname"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
-                "password": {
+                "nickname": {
                     "type": "string"
                 }
             }
         },
         "internal_app_web_ginsrv_user.EditUserReq": {
             "type": "object",
+            "required": [
+                "email",
+                "nickName"
+            ],
             "properties": {
-                "nickName": {
+                "email": {
                     "type": "string"
                 },
-                "realName": {
+                "nickName": {
                     "type": "string"
                 }
             }
@@ -1433,10 +1805,11 @@ const docTemplate = `{
         "internal_app_web_ginsrv_user.SignInReq": {
             "type": "object",
             "required": [
+                "account",
                 "password"
             ],
             "properties": {
-                "email": {
+                "account": {
                     "type": "string"
                 },
                 "password": {
