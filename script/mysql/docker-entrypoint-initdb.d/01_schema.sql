@@ -2,9 +2,9 @@
 
 CREATE TABLE `t_user_agent` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `deleted_at` bigint NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted_at` bigint NOT NULL DEFAULT 0,
   `user_xid` varchar(64) NULL,
   `ip` varchar(64) NOT NULL,
   `ua` text NOT NULL,
@@ -17,9 +17,9 @@ CREATE TABLE `t_user_agent` (
 
 CREATE TABLE `t_user` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `deleted_at` bigint NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted_at` bigint NOT NULL DEFAULT 0,
   `xid` varchar(64) NOT NULL UNIQUE,
   `email` varchar(64) NOT NULL UNIQUE,
   `nick_name` varchar(32) NULL,
@@ -34,9 +34,9 @@ CREATE TABLE `t_user` (
 
 CREATE TABLE `t_role` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `deleted_at` bigint NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted_at` bigint NOT NULL DEFAULT 0,
   `xid` varchar(64) NOT NULL UNIQUE,
   `name` varchar(64) NOT NULL,
   `intro` varchar(256) DEFAULT NULL,
@@ -48,9 +48,9 @@ CREATE TABLE `t_role` (
 
 CREATE TABLE `t_resource` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `deleted_at` bigint NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted_at` bigint NOT NULL DEFAULT 0,
   `type` tinyint NOT NULL, -- 1: 菜单；2: 控件；3: api
   `identifier` varchar(256) NOT NULL UNIQUE,
   `name` varchar(64) NOT NULL,
@@ -64,9 +64,9 @@ CREATE TABLE `t_resource` (
 
 CREATE TABLE `t_domain` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `deleted_at` bigint NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted_at` bigint NOT NULL DEFAULT 0,
   `xid` varchar(64) NOT NULL UNIQUE,
   `name` varchar(64) NOT NULL,
   `intro` varchar(256) DEFAULT NULL,
@@ -84,9 +84,9 @@ CREATE TABLE `t_domain` (
 
 CREATE TABLE `t_casbin_rule` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `deleted_at` bigint NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted_at` bigint NOT NULL DEFAULT 0,
   `ptype` varchar(512) DEFAULT NULL,
   `v0` varchar(512) DEFAULT NULL,
   `v1` varchar(512) DEFAULT NULL,

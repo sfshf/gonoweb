@@ -32,13 +32,3 @@ func InitGorm(ctx context.Context) error {
 func Create[M any](m M) error {
 	return GormDB.Create(m).Error
 }
-
-// m.ID should be greater than 0
-func SoftDeleteByID[M any](m M) error {
-	return GormDB.Delete(m).Error
-}
-
-// m.ID should be greater than 0
-func RemoveByID[M any](m M) error {
-	return GormDB.Unscoped().Delete(m).Error
-}

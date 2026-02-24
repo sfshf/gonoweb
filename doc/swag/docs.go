@@ -24,6 +24,246 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/casbin/domain/:dxid/role": {
+            "get": {
+                "description": "获取域租户的角色列表",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "获取域租户的角色列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "域租户的xid",
+                        "name": "dxid",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/casbin/domain/:dxid/role/:rxid/resource": {
+            "get": {
+                "description": "获取域租户的某个角色的资源列表",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "获取域租户的某个角色的资源列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "域租户的xid",
+                        "name": "dxid",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "角色的xid",
+                        "name": "rxid",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "给域租户的角色分配资源",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "给域租户的角色分配资源",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "域租户的xid",
+                        "name": "dxid",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "角色的xid",
+                        "name": "rxid",
+                        "in": "path"
+                    },
+                    {
+                        "description": "分配所需参数",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/internal_app_web_ginsrv_casbin.AllocDomainRoleResourcesReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/casbin/user/:xid": {
+            "post": {
+                "description": "给用户分配域租户内的角色",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "给用户分配域租户内的角色",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "description": "分配所需参数",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/internal_app_web_ginsrv_casbin.AllocRolesInDomainReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/domain": {
             "get": {
                 "description": "获取域租户列表",
@@ -51,13 +291,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "description": "\u003c=0 获取所有；\u003e0 进行分页",
                         "name": "page",
                         "in": "query"
                     },
                     {
-                        "maximum": 20,
-                        "minimum": 2,
                         "type": "integer",
+                        "description": "\u003c=0 获取所有；\u003e0 进行分页",
                         "name": "pageSize",
                         "in": "query"
                     }
@@ -359,7 +599,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "name": "id",
+                        "name": "identifier",
                         "in": "query"
                     },
                     {
@@ -369,14 +609,19 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "description": "\u003c=0 获取所有；\u003e0 进行分页",
                         "name": "page",
                         "in": "query"
                     },
                     {
-                        "maximum": 20,
-                        "minimum": 2,
                         "type": "integer",
+                        "description": "\u003c=0 获取所有；\u003e0 进行分页",
                         "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "type",
                         "in": "query"
                     }
                 ],
@@ -654,18 +899,23 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "name": "dxid",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "name": "name",
                         "in": "query"
                     },
                     {
                         "type": "integer",
+                        "description": "\u003c=0 获取所有；\u003e0 进行分页",
                         "name": "page",
                         "in": "query"
                     },
                     {
-                        "maximum": 20,
-                        "minimum": 2,
                         "type": "integer",
+                        "description": "\u003c=0 获取所有；\u003e0 进行分页",
                         "name": "pageSize",
                         "in": "query"
                     }
@@ -954,13 +1204,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "description": "\u003c=0 获取所有；\u003e0 进行分页",
                         "name": "page",
                         "in": "query"
                     },
                     {
-                        "maximum": 20,
-                        "minimum": 2,
                         "type": "integer",
+                        "description": "\u003c=0 获取所有；\u003e0 进行分页",
                         "name": "pageSize",
                         "in": "query"
                     },
@@ -1244,13 +1494,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "description": "\u003c=0 获取所有；\u003e0 进行分页",
                         "name": "page",
                         "in": "query"
                     },
                     {
-                        "maximum": 20,
-                        "minimum": 2,
                         "type": "integer",
+                        "description": "\u003c=0 获取所有；\u003e0 进行分页",
                         "name": "pageSize",
                         "in": "query"
                     }
@@ -1619,6 +1869,34 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_app_web_ginsrv_casbin.AllocDomainRoleResourcesReq": {
+            "type": "object",
+            "properties": {
+                "identifiers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "internal_app_web_ginsrv_casbin.AllocRolesInDomainReq": {
+            "type": "object",
+            "required": [
+                "domain"
+            ],
+            "properties": {
+                "domain": {
+                    "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "internal_app_web_ginsrv_domain.AddDomainReq": {
             "type": "object",
             "properties": {
@@ -1661,7 +1939,7 @@ const docTemplate = `{
                 "icon": {
                     "type": "string"
                 },
-                "id": {
+                "identifier": {
                     "type": "string"
                 },
                 "intro": {

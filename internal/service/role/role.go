@@ -19,12 +19,21 @@ func ListRole(page, pageSize int, wheres map[string][]any) ([]TRole, int64, *Svc
 	if err := db.Count(&total).Error; err != nil {
 		return nil, total, &SvcErr{Internal: true, Err: err}
 	}
+	if page > 0 && pageSize > 0 {
+		db = db.Offset((page - 1) * pageSize).Limit(pageSize)
+	}
 	var list []TRole
-	if err := db.
-		Offset((page - 1) * pageSize).
-		Limit(pageSize).
-		Find(&list).Error; err != nil {
+	rows, err := db.Where(`deleted_at=0`).Rows()
+	if err != nil {
 		return nil, total, &SvcErr{Internal: true, Err: err}
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var record TRole
+		if err := db.ScanRows(rows, &record); err != nil {
+			return nil, total, &SvcErr{Internal: true, Err: err}
+		}
+		list = append(list, record)
 	}
 	return list, total, nil
 }

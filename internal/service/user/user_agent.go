@@ -91,6 +91,7 @@ func ListUserAgent(page, pageSize int) ([]TUserAgent, int64, *SvcErr) {
 	if err := db.
 		Offset((page - 1) * pageSize).
 		Limit(pageSize).
+		Where(`deleted_at=0`).
 		Find(&list).Error; err != nil {
 		return nil, total, &SvcErr{Internal: true, Err: err}
 	}

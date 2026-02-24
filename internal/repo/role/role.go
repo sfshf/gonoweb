@@ -13,6 +13,7 @@ func FirstByXid(xid string) (*TRole, error) {
 	if err := repo.GormDB.
 		Table(TableNameTRole).
 		Where("xid=?", xid).
+		Where(`deleted_at=0`).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -27,6 +28,7 @@ func FindAll() ([]TRole, error) {
 	var list []TRole
 	if err := repo.GormDB.
 		Table(TableNameTRole).
+		Where(`deleted_at=0`).
 		Find(&list).Error; err != nil {
 		return nil, err
 	}
@@ -39,6 +41,7 @@ func FirstUnscopedByName(name string) (*TRole, error) {
 		Table(TableNameTRole).
 		Unscoped().
 		Where("name=?", name).
+		Where(`deleted_at=0`).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -62,7 +65,7 @@ func ReliveByXid(xid string, m *TRole) error {
 		return tx.Unscoped().
 			Table(TableNameTRole).
 			Where("xid=?", xid).
-			Update("deleted_at", gorm.DeletedAt{}).Error
+			Update("deleted_at", 0).Error
 	})
 }
 
@@ -75,5 +78,9 @@ func UpdateByXid(xid string, m *TRole) error {
 }
 
 func DeleteByXid(xid string) error {
-	return repo.GormDB.Delete(&TRole{}, "xid=?", xid).Error
+	return repo.GormDB.
+		Table(TableNameTRole).
+		Where("xid=?", xid).
+		Update("deleted_at", time.Now().Unix()).
+		Error
 }

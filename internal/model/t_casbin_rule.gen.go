@@ -13,9 +13,9 @@ const TableNameTCasbinRule = "t_casbin_rule"
 // TCasbinRule mapped from table <t_casbin_rule>
 type TCasbinRule struct {
 	ID        int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	CreatedAt time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
-	DeletedAt int64     `gorm:"column:deleted_at" json:"deleted_at"`
+	CreatedAt time.Time `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP" json:"updated_at"`
+	DeletedAt int64     `gorm:"column:deleted_at;not null" json:"deleted_at"`
 	Ptype     string    `gorm:"column:ptype" json:"ptype"`
 	V0        string    `gorm:"column:v0" json:"v0"`
 	V1        string    `gorm:"column:v1" json:"v1"`

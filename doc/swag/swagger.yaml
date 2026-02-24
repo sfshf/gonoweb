@@ -126,6 +126,24 @@ definitions:
           $ref: '#/definitions/github_com_sfshf_gonoweb_internal_model.TResource'
         type: array
     type: object
+  internal_app_web_ginsrv_casbin.AllocDomainRoleResourcesReq:
+    properties:
+      identifiers:
+        items:
+          type: string
+        type: array
+    type: object
+  internal_app_web_ginsrv_casbin.AllocRolesInDomainReq:
+    properties:
+      domain:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+    required:
+    - domain
+    type: object
   internal_app_web_ginsrv_domain.AddDomainReq:
     properties:
       intro:
@@ -153,7 +171,7 @@ definitions:
     properties:
       icon:
         type: string
-      id:
+      identifier:
         type: string
       intro:
         type: string
@@ -272,6 +290,163 @@ info:
   title: Gono Web API
   version: "1.0"
 paths:
+  /casbin/domain/:dxid/role:
+    get:
+      consumes:
+      - text/plain
+      description: 获取域租户的角色列表
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 域租户的xid
+        in: path
+        name: dxid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 获取域租户的角色列表
+      tags:
+      - Casbin
+  /casbin/domain/:dxid/role/:rxid/resource:
+    get:
+      consumes:
+      - text/plain
+      description: 获取域租户的某个角色的资源列表
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 域租户的xid
+        in: path
+        name: dxid
+        type: string
+      - description: 角色的xid
+        in: path
+        name: rxid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 获取域租户的某个角色的资源列表
+      tags:
+      - Casbin
+    post:
+      consumes:
+      - text/plain
+      description: 给域租户的角色分配资源
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 域租户的xid
+        in: path
+        name: dxid
+        type: string
+      - description: 角色的xid
+        in: path
+        name: rxid
+        type: string
+      - description: 分配所需参数
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_app_web_ginsrv_casbin.AllocDomainRoleResourcesReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 给域租户的角色分配资源
+      tags:
+      - Casbin
+  /casbin/user/:xid:
+    post:
+      consumes:
+      - text/plain
+      description: 给用户分配域租户内的角色
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 分配所需参数
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/internal_app_web_ginsrv_casbin.AllocRolesInDomainReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 给用户分配域租户内的角色
+      tags:
+      - Casbin
   /domain:
     get:
       consumes:
@@ -285,12 +460,12 @@ paths:
       - in: query
         name: name
         type: string
-      - in: query
+      - description: <=0 获取所有；>0 进行分页
+        in: query
         name: page
         type: integer
-      - in: query
-        maximum: 20
-        minimum: 2
+      - description: <=0 获取所有；>0 进行分页
+        in: query
         name: pageSize
         type: integer
       produces:
@@ -488,18 +663,21 @@ paths:
         name: Authorization
         type: string
       - in: query
-        name: id
+        name: identifier
         type: string
       - in: query
         name: name
         type: string
-      - in: query
+      - description: <=0 获取所有；>0 进行分页
+        in: query
         name: page
         type: integer
-      - in: query
-        maximum: 20
-        minimum: 2
+      - description: <=0 获取所有；>0 进行分页
+        in: query
         name: pageSize
+        type: integer
+      - in: query
+        name: type
         type: integer
       produces:
       - application/json
@@ -681,14 +859,17 @@ paths:
         name: Authorization
         type: string
       - in: query
-        name: name
+        name: dxid
         type: string
       - in: query
+        name: name
+        type: string
+      - description: <=0 获取所有；>0 进行分页
+        in: query
         name: page
         type: integer
-      - in: query
-        maximum: 20
-        minimum: 2
+      - description: <=0 获取所有；>0 进行分页
+        in: query
         name: pageSize
         type: integer
       produces:
@@ -876,12 +1057,12 @@ paths:
       - in: query
         name: nickname
         type: string
-      - in: query
+      - description: <=0 获取所有；>0 进行分页
+        in: query
         name: page
         type: integer
-      - in: query
-        maximum: 20
-        minimum: 2
+      - description: <=0 获取所有；>0 进行分页
+        in: query
         name: pageSize
         type: integer
       - in: query
@@ -1066,12 +1247,12 @@ paths:
         in: header
         name: Authorization
         type: string
-      - in: query
+      - description: <=0 获取所有；>0 进行分页
+        in: query
         name: page
         type: integer
-      - in: query
-        maximum: 20
-        minimum: 2
+      - description: <=0 获取所有；>0 进行分页
+        in: query
         name: pageSize
         type: integer
       produces:

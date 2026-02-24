@@ -1,6 +1,8 @@
 package user
 
 import (
+	"time"
+
 	. "github.com/sfshf/gonoweb/internal/model"
 	"github.com/sfshf/gonoweb/internal/repo"
 	"gorm.io/gorm"
@@ -11,6 +13,7 @@ func UserAgent_FirstByToken(token string) (*TUserAgent, error) {
 	if err := repo.GormDB.
 		Table(TableNameTUserAgent).
 		Where("token=?", token).
+		Where(`deleted_at=0`).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -26,6 +29,7 @@ func UserAgent_FirstByIP(ip string) (*TUserAgent, error) {
 	if err := repo.GormDB.
 		Table(TableNameTUserAgent).
 		Where("ip=?", ip).
+		Where(`deleted_at=0`).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -42,6 +46,7 @@ func UserAgent_FirstUnscopedByXidAndIP(userXid, ip string) (*TUserAgent, error) 
 		Table(TableNameTUserAgent).
 		Where("ip=?", ip).
 		Where("user_xid=?", userXid).
+		Where(`deleted_at=0`).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -58,6 +63,7 @@ func UserAgent_FirstByUserXidAndIP(userXid, ip string) (*TUserAgent, error) {
 		Table(TableNameTUserAgent).
 		Where("ip=?", ip).
 		Where("user_xid=?", userXid).
+		Where(`deleted_at=0`).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -73,6 +79,7 @@ func UserAgent_FirstByUserXid(userXid string) (*TUserAgent, error) {
 	if err := repo.GormDB.
 		Table(TableNameTUserAgent).
 		Where("user_xid=?", userXid).
+		Where(`deleted_at=0`).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -105,7 +112,7 @@ func UserAgent_ReliveByXidAndIP(userXid, ip string, m *TUserAgent) error {
 			Table(TableNameTUserAgent).
 			Where("user_xid=?", userXid).
 			Where("ip=?", ip).
-			Update("deleted_at", gorm.DeletedAt{}).Error
+			Update("deleted_at", 0).Error
 	})
 }
 
@@ -114,5 +121,5 @@ func UserAgent_DeleteByToken(token string) error {
 	return repo.GormDB.
 		Table(TableNameTUserAgent).
 		Where("token=?", token).
-		Delete(&TUserAgent{}).Error
+		Update("deleted_at", time.Now().Unix()).Error
 }

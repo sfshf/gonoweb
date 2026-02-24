@@ -1,15 +1,14 @@
 package resource
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sfshf/gonoweb/internal/app/web"
 	"github.com/sfshf/gonoweb/internal/service/resource"
+	"github.com/sfshf/gonoweb/internal/util/strs"
 )
 
 // ListResource 获取菜单/控件/API列表
@@ -129,38 +128,6 @@ func ResourceInfo(c *gin.Context) {
 	})
 }
 
-func validateIdentifier(typ int32, identifier string) error {
-	switch typ {
-	case 1: // menu
-		matched, err := regexp.MatchString(`^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, identifier)
-		if err != nil {
-			return err
-		}
-		if !matched {
-			return errors.New("menu identifier must be `^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
-		}
-	case 2: // widget
-		matched, err := regexp.MatchString(`^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`, identifier)
-		if err != nil {
-			return err
-		}
-		if !matched {
-			return errors.New("widget identifier must be `^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`")
-		}
-	case 3: // api
-		matched, err := regexp.MatchString(`^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, identifier)
-		if err != nil {
-			return err
-		}
-		if !matched {
-			return errors.New("API identifier must be `^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
-		}
-	default:
-		return errors.New("unsupported identifier type")
-	}
-	return nil
-}
-
 // AddResource 新增菜单/控件/API
 // @Summary      新增菜单/控件/API
 // @Description  新增菜单/控件/API
@@ -185,7 +152,7 @@ func AddResource(c *gin.Context) {
 		return
 	}
 	// 检查identifer的格式
-	if err := validateIdentifier(req.Type, req.Identifier); err != nil {
+	if _, _, err := strs.ValidateResourceIdentifier(req.Type, req.Identifier); err != nil {
 		c.JSON(http.StatusBadRequest, &web.Response{
 			Code: web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),

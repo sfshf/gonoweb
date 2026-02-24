@@ -83,7 +83,21 @@ func LoadAuthHandles_V1(rg *gin.RouterGroup) {
 	// casbin group
 	casbing := rg.Group("/casbin")
 	{
-		casbing.PUT("/role", casbin.AuthorizeRole)
-		casbing.PUT("/resource", casbin.AuthorizeResource)
+		domg := casbing.Group("/domain")
+		{
+			roleg := domg.Group("/:dxid/role")
+			{
+				roleg.GET("", casbin.DomainRoles)
+				resourceg := roleg.Group("/:rxid/resource")
+				{
+					resourceg.GET("", casbin.DomainRoleResources)
+					resourceg.POST("", casbin.AllocDomainRoleResources)
+				}
+			}
+		}
+		usrg := casbing.Group("/user")
+		{
+			usrg.POST("/:xid", casbin.AllocRoleInDomain)
+		}
 	}
 }

@@ -10,8 +10,9 @@ func FirstGByRsub(rsub string) (*TCasbinRule, error) {
 	var record TCasbinRule
 	if err := repo.GormDB.
 		Table(TableNameTCasbinRule).
-		Where("ptype=g").
+		Where("ptype=?", "g").
 		Where("v0=?", rsub).
+		Where(`deleted_at=0`).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -27,10 +28,11 @@ func FindApiPByDomainAndRole(domain, role string) ([]TCasbinRule, error) {
 	var list []TCasbinRule
 	if err := repo.GormDB.
 		Table(TableNameTCasbinRule).
-		Where("ptype=p").
+		Where("ptype=?", "p").
 		Where("v0=?", role).
 		Where("v1=?", domain).
 		Where("v3!=''").
+		Where(`deleted_at=0`).
 		Find(&list).Error; err != nil {
 		return nil, err
 	}
@@ -42,10 +44,11 @@ func FindNonApiPByDomainAndRole(domain, role string) ([]TCasbinRule, error) {
 	var list []TCasbinRule
 	if err := repo.GormDB.
 		Table(TableNameTCasbinRule).
-		Where("ptype=p").
+		Where("ptype=?", "p").
 		Where("v0=?", role).
 		Where("v1=?", domain).
 		Where("v3=''").
+		Where(`deleted_at=0`).
 		Find(&list).Error; err != nil {
 		return nil, err
 	}

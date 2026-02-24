@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sfshf/gonoweb/internal/app/web"
+	"github.com/sfshf/gonoweb/internal/service/casbin"
 	"github.com/sfshf/gonoweb/internal/service/role"
 )
 
@@ -35,6 +36,19 @@ func ListRole(c *gin.Context) {
 	wheres := make(map[string][]any)
 	if req.Name != "" {
 		wheres["name LIKE ?"] = []any{"%" + req.Name + "%"}
+	}
+	if req.Dxid != "" {
+		// 从casbin中读取该域租户下的角色xid列表
+		// TODO 解决rxids数组太长，导致SQL的IN语句失效的问题
+		rxids, err := casbin.Enforcer.GetAllRolesByDomain(req.Dxid)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, &web.Response{
+				Code: web.ResponseCode_RequestError,
+				Msg:  fmt.Sprintf("请求参数错误：域租户xid错误 %s", err.Error()),
+			})
+			return
+		}
+		wheres["xid IN (?)"] = []any{rxids}
 	}
 	// 调用服务
 	list, total, svcErr := role.ListRole(req.Page, req.PageSize, wheres)

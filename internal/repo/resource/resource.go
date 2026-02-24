@@ -24,6 +24,7 @@ func FindAllMenuWidgets() ([]TResource, error) {
 			ResourceType_Menu,
 			ResourceType_Widget,
 		).
+		Where(`deleted_at=0`).
 		Find(&list).Error; err != nil {
 		return nil, err
 	}
@@ -35,7 +36,7 @@ func FindMenuWidgetsByDomainAndRole(domain, role string) ([]TResource, error) {
 	if err := repo.GormDB.
 		Table(TableNameTResource).
 		Joins(`LEFT JOIN t_casbin_rule ON t_resource.identifier=t_casbin_rule.v2`).
-		Where("t_casbin_rule.ptype=p").
+		Where("t_casbin_rule.ptype=?", "p").
 		Where("t_casbin_rule.v0=?", role).
 		Where("t_casbin_rule.v1=?", domain).
 		Where("t_casbin_rule.v3=''").
@@ -43,6 +44,7 @@ func FindMenuWidgetsByDomainAndRole(domain, role string) ([]TResource, error) {
 			ResourceType_Menu,
 			ResourceType_Widget,
 		).
+		Where(`t_resource.deleted_at=0`).
 		Find(&list).Error; err != nil {
 		return nil, err
 	}
@@ -54,6 +56,7 @@ func FirstByID(id int64) (*TResource, error) {
 	if err := repo.GormDB.
 		Table(TableNameTResource).
 		Where("id=?", id).
+		Where(`deleted_at=0`).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -68,6 +71,7 @@ func FindAll() ([]TResource, error) {
 	var list []TResource
 	if err := repo.GormDB.
 		Table(TableNameTResource).
+		Where(`deleted_at=0`).
 		Find(&list).Error; err != nil {
 		return nil, err
 	}
@@ -80,6 +84,7 @@ func FirstUnscopedByIdentifier(identifier string) (*TResource, error) {
 		Table(TableNameTResource).
 		Unscoped().
 		Where("identifier=?", identifier).
+		Where(`deleted_at=0`).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -103,7 +108,7 @@ func ReliveByIdentifier(identifier string, m *TResource) error {
 		return tx.Unscoped().
 			Table(TableNameTResource).
 			Where("identifier=?", identifier).
-			Update("deleted_at", gorm.DeletedAt{}).Error
+			Update("deleted_at", 0).Error
 	})
 }
 
@@ -116,5 +121,8 @@ func UpdateByID(id int64, m *TResource) error {
 }
 
 func DeleteByIdentifier(id int64) error {
-	return repo.GormDB.Delete(&TResource{}, "id=?", id).Error
+	return repo.GormDB.
+		Table(TableNameTResource).
+		Where("id=?", id).
+		Update("deleted_at", time.Now().Unix()).Error
 }

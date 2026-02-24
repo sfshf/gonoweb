@@ -1,12 +1,12 @@
 package resource
 
 import (
-	gono_web "github.com/sfshf/gonoweb/internal/app/web"
+	"github.com/sfshf/gonoweb/internal/app/web"
 	"github.com/sfshf/gonoweb/internal/model"
 )
 
 type ListResourceReq struct {
-	gono_web.Pagination
+	web.Pagination
 	Type       int    `json:"type" form:"type" binding:""`
 	Name       string `json:"name" form:"name" binding:""`
 	Identifier string `json:"identifier" form:"identifier" binding:""`

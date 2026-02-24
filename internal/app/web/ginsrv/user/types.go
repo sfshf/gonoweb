@@ -1,7 +1,7 @@
 package user
 
 import (
-	gono_web "github.com/sfshf/gonoweb/internal/app/web"
+	"github.com/sfshf/gonoweb/internal/app/web"
 	"github.com/sfshf/gonoweb/internal/model"
 )
 
@@ -11,7 +11,7 @@ type SignInReq struct {
 }
 
 type ListUserAgentReq struct {
-	gono_web.Pagination
+	web.Pagination
 }
 
 type ListUserAgentResp struct {
@@ -20,7 +20,7 @@ type ListUserAgentResp struct {
 }
 
 type ListUserReq struct {
-	gono_web.Pagination
+	web.Pagination
 	Email    string `json:"email" form:"email" binding:""`
 	Nickname string `json:"nickname" form:"nickname" binding:""`
 	Realname string `json:"realname" form:"realname" binding:""`

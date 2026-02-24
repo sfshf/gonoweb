@@ -13,9 +13,9 @@ const TableNameTUserAgent = "t_user_agent"
 // TUserAgent mapped from table <t_user_agent>
 type TUserAgent struct {
 	ID        int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	CreatedAt time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
-	DeletedAt int64     `gorm:"column:deleted_at" json:"deleted_at"`
+	CreatedAt time.Time `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP" json:"updated_at"`
+	DeletedAt int64     `gorm:"column:deleted_at;not null" json:"deleted_at"`
 	UserXid   string    `gorm:"column:user_xid" json:"user_xid"`
 	IP        string    `gorm:"column:ip;not null" json:"ip"`
 	Ua        string    `gorm:"column:ua;not null" json:"ua"`

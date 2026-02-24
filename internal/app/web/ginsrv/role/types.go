@@ -1,13 +1,14 @@
 package role
 
 import (
-	gono_web "github.com/sfshf/gonoweb/internal/app/web"
+	"github.com/sfshf/gonoweb/internal/app/web"
 	"github.com/sfshf/gonoweb/internal/model"
 )
 
 type ListRoleReq struct {
-	gono_web.Pagination
+	web.Pagination
 	Name string `json:"name" form:"name" binding:""`
+	Dxid string `json:"dxid" form:"dxid" binding:""`
 }
 
 type ListRoleResp struct {

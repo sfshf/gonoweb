@@ -1,12 +1,12 @@
 package domain
 
 import (
-	gono_web "github.com/sfshf/gonoweb/internal/app/web"
+	"github.com/sfshf/gonoweb/internal/app/web"
 	"github.com/sfshf/gonoweb/internal/model"
 )
 
 type ListDomainReq struct {
-	gono_web.Pagination
+	web.Pagination
 	Name string `json:"name" form:"name" binding:""`
 }
 
