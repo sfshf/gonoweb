@@ -28,10 +28,14 @@ import {
   MailIcon,
   TrashIcon,
   UserIcon,
+  KeyIcon,
+  UserPlusIcon,
+  IdentificationIcon,
 } from "@/components/icons";
 import { hasWidget, useAuthStore } from "@/zustand/user";
 import { AuthStore, TUser } from "@/zustand/types";
 import { siteWidgets } from "@/config/site";
+import { AllocRoleModal } from "@/components/alloc-role";
 
 const AddUser = ({
   isOpen,
@@ -53,7 +57,7 @@ const AddUser = ({
       case "nickname":
         return { ...state, nickname: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
@@ -100,52 +104,50 @@ const AddUser = ({
     }
   };
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("user.add.header")}
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  endContent={
-                    <MailIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("user.label.email")}
-                  isRequired
-                  type='email'
-                  placeholder={t("user.placeholder.email")}
-                  variant='bordered'
-                  onValueChange={onValueChangeEmail}
-                  onClear={onClearEmail}
-                />
-                <Input
-                  endContent={
-                    <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("user.label.nickname")}
-                  isRequired
-                  placeholder={t("user.placeholder.nickname")}
-                  variant='bordered'
-                  onValueChange={onValueChangeNickname}
-                  onClear={onClearNickname}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("user.add.header")}
+            </ModalHeader>
+            <ModalBody>
+              <Input
+                endContent={
+                  <MailIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("user.label.email")}
+                isRequired
+                type='email'
+                placeholder={t("user.placeholder.email")}
+                variant='bordered'
+                onValueChange={onValueChangeEmail}
+                onClear={onClearEmail}
+              />
+              <Input
+                endContent={
+                  <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("user.label.nickname")}
+                isRequired
+                placeholder={t("user.placeholder.nickname")}
+                variant='bordered'
+                onValueChange={onValueChangeNickname}
+                onClear={onClearNickname}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
@@ -171,7 +173,7 @@ const EditUser = ({
       case "nickname":
         return { ...state, nickname: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
@@ -180,9 +182,13 @@ const EditUser = ({
     nickname: user?.nick_name ?? "",
   });
   React.useEffect(() => {
-    dispatch({ type: "xid", value: user?.xid ?? "" });
-    dispatch({ type: "email", value: user?.email ?? "" });
-    dispatch({ type: "nickname", value: user?.nick_name ?? "" });
+    dispatch({
+      value: {
+        xid: user?.xid ?? "",
+        email: user?.email ?? "",
+        nickname: user?.nick_name ?? "",
+      },
+    });
   }, [user]);
   const onValueChangeEmail = (value: string) => {
     dispatch({ type: "email", value });
@@ -225,56 +231,54 @@ const EditUser = ({
     }
   };
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("user.edit.header")}
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  endContent={
-                    <MailIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("user.label.email")}
-                  isRequired
-                  type='email'
-                  placeholder={t("user.placeholder.email")}
-                  variant='bordered'
-                  onValueChange={onValueChangeEmail}
-                  onClear={onClearEmail}
-                  defaultValue={state.email}
-                  value={state.email}
-                />
-                <Input
-                  endContent={
-                    <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("user.label.nickname")}
-                  isRequired
-                  placeholder={t("user.placeholder.nickname")}
-                  variant='bordered'
-                  onValueChange={onValueChangeNickname}
-                  onClear={onClearNickname}
-                  defaultValue={state.nickname}
-                  value={state.nickname}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("user.edit.header")}
+            </ModalHeader>
+            <ModalBody>
+              <Input
+                endContent={
+                  <MailIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("user.label.email")}
+                isRequired
+                type='email'
+                placeholder={t("user.placeholder.email")}
+                variant='bordered'
+                onValueChange={onValueChangeEmail}
+                onClear={onClearEmail}
+                defaultValue={state.email}
+                value={state.email}
+              />
+              <Input
+                endContent={
+                  <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("user.label.nickname")}
+                isRequired
+                placeholder={t("user.placeholder.nickname")}
+                variant='bordered'
+                onValueChange={onValueChangeNickname}
+                onClear={onClearNickname}
+                defaultValue={state.nickname}
+                value={state.nickname}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
@@ -314,30 +318,28 @@ const DeleteUser = ({
     }
   };
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("user.edit.header")}
-              </ModalHeader>
-              <ModalBody>
-                <p>{t("app.prompt.delete", { target: user?.email ?? "" })}</p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("user.edit.header")}
+            </ModalHeader>
+            <ModalBody>
+              <p>{t("app.prompt.delete", { target: user?.email ?? "" })}</p>
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
@@ -399,7 +401,7 @@ export default function UserPage() {
       case "list":
         return { ...state, list: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
@@ -493,6 +495,18 @@ export default function UserPage() {
     onCloseAdd();
     searchUser(state.page);
   };
+  const [user, setUser] = React.useState<TUser | null>(null);
+  // alloc role to the user
+  const {
+    isOpen: isOpenAllocRole,
+    onOpen: onOpenAllocRole,
+    onOpenChange: onOpenChangeAllocRole,
+    onClose: onCloseAllocRole,
+  } = useDisclosure();
+  const onPressAllocRole = (user: TUser) => () => {
+    setUser(user);
+    onOpenAllocRole();
+  };
   // edit user modal
   const {
     isOpen: isOpenEdit,
@@ -500,7 +514,6 @@ export default function UserPage() {
     onOpenChange: onOpenChangeEdit,
     onClose: onCloseEdit,
   } = useDisclosure();
-  const [user, setUser] = React.useState<TUser | null>(null);
   const onPressEdit = (user: TUser) => () => {
     setUser(user);
     onOpenEdit();
@@ -612,6 +625,22 @@ export default function UserPage() {
                               className='bg-transparent'
                               isIconOnly
                               startContent={
+                                <IdentificationIcon
+                                  size={20}
+                                  className={
+                                    !isRoot(item.email)
+                                      ? "text-yellow-400"
+                                      : "text-gray-400"
+                                  }
+                                />
+                              }
+                              disabled={isRoot(item.email)}
+                              onPress={onPressAllocRole(item)}
+                            />
+                            <Button
+                              className='bg-transparent'
+                              isIconOnly
+                              startContent={
                                 <PencilSquareIcon
                                   size={20}
                                   className={
@@ -621,6 +650,7 @@ export default function UserPage() {
                                   }
                                 />
                               }
+                              disabled={isRoot(item.email)}
                               onPress={onPressEdit(item)}
                             />
                             <Button
@@ -636,6 +666,7 @@ export default function UserPage() {
                                   }
                                 />
                               }
+                              disabled={isRoot(item.email)}
                               onPress={onPressDelete(item)}
                             />
                           </TableCell>
@@ -646,7 +677,6 @@ export default function UserPage() {
                 )}
               </TableBody>
             </Table>
-
             {state.list.length > 0 && (
               <Pagination
                 initialPage={state.page ?? 1}
@@ -659,6 +689,12 @@ export default function UserPage() {
             isOpen={isOpenAdd}
             onOpenChange={onOpenChangeAdd}
             onClose={onCloseAddUser}
+          />
+          <AllocRoleModal
+            user={user}
+            isOpen={isOpenAllocRole}
+            onOpenChange={onOpenChangeAllocRole}
+            onClose={onCloseAllocRole}
           />
           <EditUser
             user={user}

@@ -15,6 +15,9 @@ export const postJson = async (url: string, json?: Object): Promise<any> => {
   if (resp.status >= 500) {
     throw new Error(`${data.msg}`, { cause: "Internal Error" });
   } else if (resp.status >= 400) {
+    if (resp.status == 401) {
+      useAuthStore.getState().clearAuth();
+    }
     throw new Error(`${data.msg}`, { cause: "Bad Request" });
   } else if (resp.ok) {
     return data;
@@ -34,6 +37,9 @@ export const getJson = async (url: string): Promise<any> => {
   if (resp.status >= 500) {
     throw new Error(`${data.msg}`, { cause: "Internal Error" });
   } else if (resp.status >= 400) {
+    if (resp.status == 401) {
+      useAuthStore.getState().clearAuth();
+    }
     throw new Error(`${data.msg}`, { cause: "Bad Request" });
   } else if (resp.ok) {
     return data;
@@ -55,6 +61,9 @@ export const putJson = async (url: string, json?: Object): Promise<any> => {
   if (resp.status >= 500) {
     throw new Error(`${data.msg}`, { cause: "Internal Error" });
   } else if (resp.status >= 400) {
+    if (resp.status == 401) {
+      useAuthStore.getState().clearAuth();
+    }
     throw new Error(`${data.msg}`, { cause: "Bad Request" });
   } else if (resp.ok) {
     return data;
@@ -74,6 +83,9 @@ export const deleteJson = async (url: string): Promise<any> => {
   if (resp.status >= 500) {
     throw new Error(`${data.msg}`, { cause: "Internal Error" });
   } else if (resp.status >= 400) {
+    if (resp.status == 401) {
+      useAuthStore.getState().clearAuth();
+    }
     throw new Error(`${data.msg}`, { cause: "Bad Request" });
   } else if (resp.ok) {
     return data;

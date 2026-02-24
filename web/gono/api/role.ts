@@ -4,6 +4,7 @@ export type ListRoleReq = {
   page: number;
   pageSize: number;
   name: string;
+  dxid: string;
 };
 
 export const listRole = async (req: ListRoleReq): Promise<any> => {
@@ -14,7 +15,9 @@ export const listRole = async (req: ListRoleReq): Promise<any> => {
     "&pageSize=" +
     req.pageSize +
     "&name=" +
-    req.name;
+    req.name +
+    "&dxid=" +
+    req.dxid;
   return await getJson(url);
 };
 

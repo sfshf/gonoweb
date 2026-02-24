@@ -92,7 +92,8 @@
       "header": "编辑角色"
     },
     "placeholder": {
-      "name": "输入角色名称"
+      "name": "输入角色名称",
+      "intro": "输入角色简介"
     },
     "label": {
       "name": "名称",
@@ -131,6 +132,22 @@
       "createdAt": "创建时间",
       "updatedAt": "更新时间",
       "operation": "操作"
+    }
+  },
+  "alloc_resource": {
+    "header": "给域租户中的角色分配资源",
+    "label": {
+      "roles": "角色列表",
+      "menus": "菜单列表",
+      "widgets": "控件列表",
+      "apis": "接口列表"
+    }
+  },
+  "alloc_role": {
+    "header": "给用户分配域租户中的角色",
+    "label": {
+      "domains": "域租户列表",
+      "roles": "角色列表"
     }
   }
 }

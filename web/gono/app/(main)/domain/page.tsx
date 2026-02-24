@@ -28,10 +28,15 @@ import {
   DocumentTextIcon,
   TrashIcon,
   BuildingLibraryIcon,
+  UserGroupIcon,
+  UserPlusIcon,
+  KeyIcon,
 } from "@/components/icons";
 import { hasWidget, useAuthStore } from "@/zustand/user";
 import { AuthStore, TDomain } from "@/zustand/types";
 import { siteWidgets } from "@/config/site";
+import { useRouter } from "next/navigation";
+import { AllocResourceModal } from "@/components/alloc-resource";
 
 const AddDomain = ({
   isOpen,
@@ -53,7 +58,7 @@ const AddDomain = ({
       case "intro":
         return { ...state, intro: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
@@ -95,52 +100,50 @@ const AddDomain = ({
     }
   };
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("domain.add.header")}
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  endContent={
-                    <BuildingLibraryIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("domain.label.name")}
-                  isRequired
-                  type='text'
-                  placeholder={t("domain.placeholder.name")}
-                  variant='bordered'
-                  onValueChange={onValueChangeName}
-                  onClear={onClearName}
-                />
-                <Input
-                  endContent={
-                    <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("domain.label.intro")}
-                  isRequired
-                  placeholder={t("domain.placeholder.intro")}
-                  variant='bordered'
-                  onValueChange={onValueChangeIntro}
-                  onClear={onClearIntro}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("domain.add.header")}
+            </ModalHeader>
+            <ModalBody>
+              <Input
+                endContent={
+                  <BuildingLibraryIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("domain.label.name")}
+                isRequired
+                type='text'
+                placeholder={t("domain.placeholder.name")}
+                variant='bordered'
+                onValueChange={onValueChangeName}
+                onClear={onClearName}
+              />
+              <Input
+                endContent={
+                  <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("domain.label.intro")}
+                isRequired
+                placeholder={t("domain.placeholder.intro")}
+                variant='bordered'
+                onValueChange={onValueChangeIntro}
+                onClear={onClearIntro}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
@@ -166,7 +169,7 @@ const EditDomain = ({
       case "intro":
         return { ...state, intro: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
@@ -175,9 +178,13 @@ const EditDomain = ({
     intro: domain?.intro ?? "",
   });
   React.useEffect(() => {
-    dispatch({ type: "xid", value: domain?.xid ?? "" });
-    dispatch({ type: "name", value: domain?.name ?? "" });
-    dispatch({ type: "intro", value: domain?.intro ?? "" });
+    dispatch({
+      value: {
+        xid: domain?.xid ?? "",
+        name: domain?.name ?? "",
+        intro: domain?.intro ?? "",
+      },
+    });
   }, [domain]);
   const onValueChangeName = (value: string) => {
     dispatch({ type: "name", value });
@@ -215,57 +222,55 @@ const EditDomain = ({
     }
   };
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("domain.edit.header")}
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  endContent={
-                    <BuildingLibraryIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("domain.label.name")}
-                  isRequired
-                  type='text'
-                  placeholder={t("domain.placeholder.name")}
-                  variant='bordered'
-                  onValueChange={onValueChangeName}
-                  onClear={onClearName}
-                  defaultValue={state.name}
-                  value={state.name}
-                />
-                <Input
-                  endContent={
-                    <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("domain.label.intro")}
-                  isRequired
-                  type='text'
-                  placeholder={t("domain.placeholder.intro")}
-                  variant='bordered'
-                  onValueChange={onValueChangeIntro}
-                  onClear={onClearIntro}
-                  defaultValue={state.intro}
-                  value={state.intro}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("domain.edit.header")}
+            </ModalHeader>
+            <ModalBody>
+              <Input
+                endContent={
+                  <BuildingLibraryIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("domain.label.name")}
+                isRequired
+                type='text'
+                placeholder={t("domain.placeholder.name")}
+                variant='bordered'
+                onValueChange={onValueChangeName}
+                onClear={onClearName}
+                defaultValue={state.name}
+                value={state.name}
+              />
+              <Input
+                endContent={
+                  <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("domain.label.intro")}
+                isRequired
+                type='text'
+                placeholder={t("domain.placeholder.intro")}
+                variant='bordered'
+                onValueChange={onValueChangeIntro}
+                onClear={onClearIntro}
+                defaultValue={state.intro}
+                value={state.intro}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
@@ -305,30 +310,28 @@ const DeleteDomain = ({
     }
   };
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("domain.edit.header")}
-              </ModalHeader>
-              <ModalBody>
-                <p>{t("app.prompt.delete", { target: domain?.name ?? "" })}</p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("domain.edit.header")}
+            </ModalHeader>
+            <ModalBody>
+              <p>{t("app.prompt.delete", { target: domain?.name ?? "" })}</p>
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
@@ -373,7 +376,7 @@ export default function DomainPage() {
       case "list":
         return { ...state, list: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
@@ -445,6 +448,23 @@ export default function DomainPage() {
     onCloseAdd();
     searchDomain(state.page);
   };
+
+  const router = useRouter();
+  const onPressRoles = (domain: TDomain) => () => {
+    router.push("/role?dxid=" + domain.xid);
+  };
+  const [domain, setDomain] = React.useState<TDomain | null>(null);
+  // alloc resource modal
+  const {
+    isOpen: isOpenAllocResource,
+    onOpen: onOpenAllocResource,
+    onOpenChange: onOpenChangeAllocResource,
+    onClose: onCloseAllocResource,
+  } = useDisclosure();
+  const onPressAllocResource = (domain: TDomain) => () => {
+    setDomain(domain);
+    onOpenAllocResource();
+  };
   // edit domain modal
   const {
     isOpen: isOpenEdit,
@@ -452,7 +472,6 @@ export default function DomainPage() {
     onOpenChange: onOpenChangeEdit,
     onClose: onCloseEdit,
   } = useDisclosure();
-  const [domain, setDomain] = React.useState<TDomain | null>(null);
   const onPressEdit = (domain: TDomain) => () => {
     setDomain(domain);
     onOpenEdit();
@@ -518,7 +537,6 @@ export default function DomainPage() {
                 </>
               )}
             </div>
-
             <Table
               className='min-w-[90vw] max-w-screen min-h-[700px] max-h-[1200px]'
               aria-label='domain table'
@@ -529,7 +547,7 @@ export default function DomainPage() {
                 )}
               </TableHeader>
               <TableBody
-                items={state.list}
+                items={state.list ?? []}
                 emptyContent={t("app.prompt.tableNoContent")}
               >
                 {(item: TDomain) => (
@@ -542,6 +560,28 @@ export default function DomainPage() {
                       } else {
                         return (
                           <TableCell>
+                            <Button
+                              className='bg-transparent'
+                              isIconOnly
+                              startContent={
+                                <UserGroupIcon
+                                  size={20}
+                                  className='text-purple-400'
+                                />
+                              }
+                              onPress={onPressRoles(item)}
+                            />
+                            <Button
+                              className='bg-transparent'
+                              isIconOnly
+                              startContent={
+                                <KeyIcon
+                                  size={20}
+                                  className='text-yellow-400'
+                                />
+                              }
+                              onPress={onPressAllocResource(item)}
+                            />
                             <Button
                               className='bg-transparent'
                               isIconOnly
@@ -569,8 +609,7 @@ export default function DomainPage() {
                 )}
               </TableBody>
             </Table>
-
-            {state.list.length > 0 && (
+            {state.list && state.list.length > 0 && (
               <Pagination
                 initialPage={state.page ?? 1}
                 total={state.total}
@@ -582,6 +621,12 @@ export default function DomainPage() {
             isOpen={isOpenAdd}
             onOpenChange={onOpenChangeAdd}
             onClose={onCloseAddDomain}
+          />
+          <AllocResourceModal
+            domain={domain}
+            isOpen={isOpenAllocResource}
+            onOpenChange={onOpenChangeAllocResource}
+            onClose={onCloseAllocResource}
           />
           <EditDomain
             domain={domain}

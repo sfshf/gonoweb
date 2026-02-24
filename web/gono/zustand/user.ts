@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { AuthStore, TDomain, TMenuWidget, TRole, TUser } from "./types";
+import { AuthStore, TDomain, TResource, TRole, TUser } from "./types";
 
 export const LocalStorageKey_AuthStore = "user_auth";
 export const useAuthStore = create<AuthStore>()(
@@ -17,8 +17,8 @@ export const useAuthStore = create<AuthStore>()(
         user: TUser | null,
         domain: TDomain | null,
         role: TRole | null,
-        menus: TMenuWidget[] | null,
-        widgets: TMenuWidget[] | null
+        menus: TResource[] | null,
+        widgets: TResource[] | null,
       ) => set({ token, user, domain, role, menus, widgets }),
       clearAuth: () => {
         useAuthStore.persist.clearStorage();
@@ -28,8 +28,8 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: LocalStorageKey_AuthStore, // storage key
       // 默认使用 localStorage
-    }
-  )
+    },
+  ),
 );
 
 export const isRoot = (): boolean => {

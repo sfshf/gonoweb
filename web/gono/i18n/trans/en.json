@@ -92,7 +92,8 @@
       "header": "Edit Role"
     },
     "placeholder": {
-      "name": "Enter role name"
+      "name": "Enter role name",
+      "intro": "Enter role introduction"
     },
     "label": {
       "name": "Name",
@@ -131,6 +132,22 @@
       "createdAt": "CreatedAt",
       "updatedAt": "UpdatedAt",
       "operation": "Operation"
+    }
+  },
+  "alloc_resource": {
+    "header": "Allocate Resource To Roles In Domain",
+    "label": {
+      "roles": "Role List",
+      "menus": "Menu List",
+      "widgets": "Widget List",
+      "apis": "API List"
+    }
+  },
+  "alloc_role": {
+    "header": "Allocate Roles In Domain To User",
+    "label": {
+      "domains": "Domain List",
+      "roles": "Role List"
     }
   }
 }

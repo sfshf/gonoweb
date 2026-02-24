@@ -32,6 +32,7 @@ import {
 import { hasWidget, useAuthStore } from "@/zustand/user";
 import { AuthStore, TRole } from "@/zustand/types";
 import { siteWidgets } from "@/config/site";
+import { useSearchParams } from "next/navigation";
 
 const AddRole = ({
   isOpen,
@@ -53,7 +54,7 @@ const AddRole = ({
       case "intro":
         return { ...state, intro: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
@@ -95,52 +96,50 @@ const AddRole = ({
     }
   };
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("role.add.header")}
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  endContent={
-                    <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("role.label.name")}
-                  isRequired
-                  type='text'
-                  placeholder={t("role.placeholder.name")}
-                  variant='bordered'
-                  onValueChange={onValueChangeName}
-                  onClear={onClearName}
-                />
-                <Input
-                  endContent={
-                    <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("role.label.intro")}
-                  isRequired
-                  placeholder={t("role.placeholder.intro")}
-                  variant='bordered'
-                  onValueChange={onValueChangeIntro}
-                  onClear={onClearIntro}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("role.add.header")}
+            </ModalHeader>
+            <ModalBody>
+              <Input
+                endContent={
+                  <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("role.label.name")}
+                isRequired
+                type='text'
+                placeholder={t("role.placeholder.name")}
+                variant='bordered'
+                onValueChange={onValueChangeName}
+                onClear={onClearName}
+              />
+              <Input
+                endContent={
+                  <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("role.label.intro")}
+                isRequired
+                placeholder={t("role.placeholder.intro")}
+                variant='bordered'
+                onValueChange={onValueChangeIntro}
+                onClear={onClearIntro}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
@@ -166,7 +165,7 @@ const EditRole = ({
       case "intro":
         return { ...state, intro: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
@@ -215,61 +214,58 @@ const EditRole = ({
     }
   };
   React.useEffect(() => {
-    dispatch({ type: "name", value: role?.name ?? "" });
-    dispatch({ type: "intro", value: role?.intro ?? "" });
+    dispatch({ value: { name: role?.name ?? "", intro: role?.intro ?? "" } });
   }, [role]);
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("role.edit.header")}
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  endContent={
-                    <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("role.label.name")}
-                  isRequired
-                  type='text'
-                  placeholder={t("role.placeholder.name")}
-                  variant='bordered'
-                  onValueChange={onValueChangeName}
-                  onClear={onClearName}
-                  defaultValue={state.name}
-                  value={state.name}
-                />
-                <Input
-                  endContent={
-                    <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("role.label.intro")}
-                  isRequired
-                  type='text'
-                  placeholder={t("role.placeholder.intro")}
-                  variant='bordered'
-                  onValueChange={onValueChangeIntro}
-                  onClear={onClearIntro}
-                  defaultValue={state.intro}
-                  value={state.intro}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("role.edit.header")}
+            </ModalHeader>
+            <ModalBody>
+              <Input
+                endContent={
+                  <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("role.label.name")}
+                isRequired
+                type='text'
+                placeholder={t("role.placeholder.name")}
+                variant='bordered'
+                onValueChange={onValueChangeName}
+                onClear={onClearName}
+                defaultValue={state.name}
+                value={state.name}
+              />
+              <Input
+                endContent={
+                  <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("role.label.intro")}
+                isRequired
+                type='text'
+                placeholder={t("role.placeholder.intro")}
+                variant='bordered'
+                onValueChange={onValueChangeIntro}
+                onClear={onClearIntro}
+                defaultValue={state.intro}
+                value={state.intro}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
@@ -309,34 +305,33 @@ const DeleteRole = ({
     }
   };
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("role.edit.header")}
-              </ModalHeader>
-              <ModalBody>
-                <p>{t("app.prompt.delete", { target: role?.name ?? "" })}</p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("role.edit.header")}
+            </ModalHeader>
+            <ModalBody>
+              <p>{t("app.prompt.delete", { target: role?.name ?? "" })}</p>
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
 export default function RolePage() {
+  const searchParams = useSearchParams();
   const { t } = useTranslation();
   const columns = [
     {
@@ -374,16 +369,19 @@ export default function RolePage() {
         return { ...state, total: action.value };
       case "name":
         return { ...state, name: action.value };
+      case "dxid":
+        return { ...state, dxid: action.value };
       case "list":
         return { ...state, list: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
     page: 1, // start from 1
     pageSize: 10,
     name: "",
+    dxid: searchParams.get("dxid") ?? "",
     list: [],
     total: 0,
   });
@@ -399,9 +397,10 @@ export default function RolePage() {
         page,
         pageSize: state.pageSize,
         name: state.name,
+        dxid: state.dxid,
       });
       setIsLoading(false);
-      dispatch({ type: "list", value: resp.data.list });
+      dispatch({ type: "list", value: resp.data.list ?? [] });
       dispatch({ type: "total", value: resp.data.total / state.pageSize + 1 });
       addToast({
         title: t("app.prompt.ok"),
@@ -421,8 +420,16 @@ export default function RolePage() {
   React.useEffect(() => {
     if (!token) {
       // reset states
-      dispatch({ type: "list", value: [] });
-      dispatch({ type: "total", value: 0 });
+      dispatch({
+        value: {
+          page: 1, // start from 1
+          pageSize: 10,
+          name: "",
+          dxid: searchParams.get("dxid") ?? "",
+          list: [],
+          total: 0,
+        },
+      });
       return;
     }
     searchRole(state.page);
@@ -449,6 +456,7 @@ export default function RolePage() {
     onCloseAdd();
     searchRole(state.page);
   };
+  const [role, setRole] = React.useState<TRole | null>(null);
   // edit role modal
   const {
     isOpen: isOpenEdit,
@@ -456,7 +464,6 @@ export default function RolePage() {
     onOpenChange: onOpenChangeEdit,
     onClose: onCloseEdit,
   } = useDisclosure();
-  const [role, setRole] = React.useState<TRole | null>(null);
   const onPressEdit = (role: TRole) => () => {
     setRole(role);
     onOpenEdit();
@@ -522,7 +529,6 @@ export default function RolePage() {
                 </>
               )}
             </div>
-
             <Table
               className='min-w-[90vw] max-w-screen min-h-[700px] max-h-[1200px]'
               aria-label='role table'

@@ -108,7 +108,7 @@ export default function SignInPage() {
           <Input
             isRequired
             errorMessage='Please enter password'
-            label={t("signIn.label.Password")}
+            label={t("signIn.label.password")}
             labelPlacement='outside'
             name='password'
             placeholder={t("signIn.placeholder.password")}

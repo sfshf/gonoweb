@@ -92,7 +92,7 @@ const AddResource = ({
       case "icon":
         return { ...state, icon: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
@@ -152,86 +152,84 @@ const AddResource = ({
     }
   };
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("resource.add.header")}
-              </ModalHeader>
-              <ModalBody>
-                <Select
-                  label={t("resource.placeholder.type")}
-                  isClearable={true}
-                  onChange={onChangeType}
-                >
-                  {resourceTypes.map((type) => (
-                    <SelectItem key={type}>
-                      {t("resource.type." + type)}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Input
-                  endContent={
-                    <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("resource.label.id")}
-                  isRequired
-                  type='text'
-                  placeholder={t("resource.placeholder.id")}
-                  variant='bordered'
-                  onValueChange={onValueChangeIdentifier}
-                  onClear={onClearIdentifier}
-                />
-                <Input
-                  endContent={
-                    <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("resource.label.name")}
-                  isRequired
-                  type='text'
-                  placeholder={t("resource.placeholder.name")}
-                  variant='bordered'
-                  onValueChange={onValueChangeName}
-                  onClear={onClearName}
-                />
-                <Input
-                  endContent={
-                    <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("resource.label.intro")}
-                  isRequired
-                  placeholder={t("resource.placeholder.intro")}
-                  variant='bordered'
-                  onValueChange={onValueChangeIntro}
-                  onClear={onClearIntro}
-                />
-                <Input
-                  endContent={
-                    <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("resource.label.icon")}
-                  isRequired
-                  placeholder={t("resource.placeholder.icon")}
-                  variant='bordered'
-                  onValueChange={onValueChangeIcon}
-                  onClear={onClearIcon}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("resource.add.header")}
+            </ModalHeader>
+            <ModalBody>
+              <Select
+                label={t("resource.placeholder.type")}
+                isClearable={true}
+                onChange={onChangeType}
+              >
+                {resourceTypes.map((type) => (
+                  <SelectItem key={type}>
+                    {t("resource.type." + type)}
+                  </SelectItem>
+                ))}
+              </Select>
+              <Input
+                endContent={
+                  <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("resource.label.id")}
+                isRequired
+                type='text'
+                placeholder={t("resource.placeholder.id")}
+                variant='bordered'
+                onValueChange={onValueChangeIdentifier}
+                onClear={onClearIdentifier}
+              />
+              <Input
+                endContent={
+                  <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("resource.label.name")}
+                isRequired
+                type='text'
+                placeholder={t("resource.placeholder.name")}
+                variant='bordered'
+                onValueChange={onValueChangeName}
+                onClear={onClearName}
+              />
+              <Input
+                endContent={
+                  <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("resource.label.intro")}
+                isRequired
+                placeholder={t("resource.placeholder.intro")}
+                variant='bordered'
+                onValueChange={onValueChangeIntro}
+                onClear={onClearIntro}
+              />
+              <Input
+                endContent={
+                  <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("resource.label.icon")}
+                isRequired
+                placeholder={t("resource.placeholder.icon")}
+                variant='bordered'
+                onValueChange={onValueChangeIcon}
+                onClear={onClearIcon}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
@@ -263,7 +261,7 @@ const EditResource = ({
       case "icon":
         return { ...state, icon: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
@@ -274,9 +272,13 @@ const EditResource = ({
     icon: resource?.icon ?? "",
   });
   React.useEffect(() => {
-    dispatch({ type: "xid", value: resource?.identifier ?? "" });
-    dispatch({ type: "name", value: resource?.name ?? "" });
-    dispatch({ type: "intro", value: resource?.intro ?? "" });
+    dispatch({
+      value: {
+        xid: resource?.identifier ?? "",
+        name: resource?.name ?? "",
+        intro: resource?.intro ?? "",
+      },
+    });
   }, [resource]);
   const onValueChangeName = (value: string) => {
     dispatch({ type: "name", value });
@@ -331,94 +333,92 @@ const EditResource = ({
     });
   }, [resource]);
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("resource.edit.header")}
-              </ModalHeader>
-              <ModalBody>
-                <Select
-                  disabled
-                  label={t("resource.placeholder.type")}
-                  selectedKeys={[resourceTypeLabel(state.type)]}
-                >
-                  {resourceTypes.map((type) => (
-                    <SelectItem key={type}>
-                      {t("resource.type." + type)}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Input
-                  disabled
-                  value={state.identifier}
-                  endContent={
-                    <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("resource.label.id")}
-                  isRequired
-                  type='text'
-                  placeholder={t("resource.placeholder.id")}
-                  variant='bordered'
-                />
-                <Input
-                  endContent={
-                    <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("resource.label.name")}
-                  isRequired
-                  type='text'
-                  placeholder={t("resource.placeholder.name")}
-                  variant='bordered'
-                  onValueChange={onValueChangeName}
-                  onClear={onClearName}
-                  defaultValue={state.name}
-                  value={state.name}
-                />
-                <Input
-                  endContent={
-                    <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("resource.label.intro")}
-                  isRequired
-                  type='text'
-                  placeholder={t("resource.placeholder.intro")}
-                  variant='bordered'
-                  onValueChange={onValueChangeIntro}
-                  onClear={onClearIntro}
-                  defaultValue={state.intro}
-                  value={state.intro}
-                />
-                <Input
-                  endContent={
-                    <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
-                  }
-                  label={t("resource.label.icon")}
-                  isRequired
-                  type='text'
-                  placeholder={t("resource.placeholder.icon")}
-                  variant='bordered'
-                  onValueChange={onValueChangeIcon}
-                  onClear={onClearIcon}
-                  defaultValue={state.icon}
-                  value={state.icon}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("resource.edit.header")}
+            </ModalHeader>
+            <ModalBody>
+              <Select
+                disabled
+                label={t("resource.placeholder.type")}
+                selectedKeys={[resourceTypeLabel(state.type)]}
+              >
+                {resourceTypes.map((type) => (
+                  <SelectItem key={type}>
+                    {t("resource.type." + type)}
+                  </SelectItem>
+                ))}
+              </Select>
+              <Input
+                disabled
+                value={state.identifier}
+                endContent={
+                  <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("resource.label.id")}
+                isRequired
+                type='text'
+                placeholder={t("resource.placeholder.id")}
+                variant='bordered'
+              />
+              <Input
+                endContent={
+                  <UserIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("resource.label.name")}
+                isRequired
+                type='text'
+                placeholder={t("resource.placeholder.name")}
+                variant='bordered'
+                onValueChange={onValueChangeName}
+                onClear={onClearName}
+                defaultValue={state.name}
+                value={state.name}
+              />
+              <Input
+                endContent={
+                  <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("resource.label.intro")}
+                isRequired
+                type='text'
+                placeholder={t("resource.placeholder.intro")}
+                variant='bordered'
+                onValueChange={onValueChangeIntro}
+                onClear={onClearIntro}
+                defaultValue={state.intro}
+                value={state.intro}
+              />
+              <Input
+                endContent={
+                  <DocumentTextIcon className='text-2xl text-default-400 pointer-events-none shrink-0' />
+                }
+                label={t("resource.label.icon")}
+                isRequired
+                type='text'
+                placeholder={t("resource.placeholder.icon")}
+                variant='bordered'
+                onValueChange={onValueChangeIcon}
+                onClear={onClearIcon}
+                defaultValue={state.icon}
+                value={state.icon}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
@@ -458,34 +458,32 @@ const DeleteResource = ({
     }
   };
   return (
-    <>
-      <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>
-                {t("resource.edit.header")}
-              </ModalHeader>
-              <ModalBody>
-                <p>
-                  {t("app.prompt.delete", {
-                    target: resource?.identifier ?? "",
-                  })}
-                </p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  {t("app.btn.close")}
-                </Button>
-                <Button color='primary' onPress={onPressConfirm}>
-                  {t("app.btn.confirm")}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal isOpen={isOpen} placement='top-center' onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className='flex flex-col gap-1'>
+              {t("resource.edit.header")}
+            </ModalHeader>
+            <ModalBody>
+              <p>
+                {t("app.prompt.delete", {
+                  target: resource?.identifier ?? "",
+                })}
+              </p>
+            </ModalBody>
+            <ModalFooter>
+              <Button color='danger' variant='flat' onPress={onClose}>
+                {t("app.btn.close")}
+              </Button>
+              <Button color='primary' onPress={onPressConfirm}>
+                {t("app.btn.confirm")}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
@@ -542,7 +540,7 @@ export default function ResourcePage() {
       case "list":
         return { ...state, list: action.value };
       default:
-        return { ...action.value };
+        return { ...state, ...action.value };
     }
   };
   const [state, dispatch] = React.useReducer(reducer, {
