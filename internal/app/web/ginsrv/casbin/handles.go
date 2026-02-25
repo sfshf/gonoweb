@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sfshf/gonoweb/internal/app/web"
 	"github.com/sfshf/gonoweb/internal/config"
+	"github.com/sfshf/gonoweb/internal/repo/resource"
 	"github.com/sfshf/gonoweb/internal/repo/user"
 	"github.com/sfshf/gonoweb/internal/service/casbin"
 	"github.com/sfshf/gonoweb/internal/util/strs"
@@ -47,19 +48,20 @@ func DomainRoleResources(c *gin.Context) {
 	}
 	policies, err := casbin.Enforcer.GetFilteredPolicy(0, rxid, dxid)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, &web.Response{
-			Code: web.ResponseCode_RequestError,
-			Msg:  fmt.Sprintf("请求参数错误：域租户xid错误 %s", err.Error()),
+		c.JSON(http.StatusInternalServerError, &web.Response{
+			Code: web.ResponseCode_InternalError,
+			Msg:  err.Error(),
 		})
 		return
 	}
 	var list []string
 	for _, p := range policies {
-		list = append(list, strings.TrimSpace(strings.Join([]string{
-			p[3], // act
-			p[2], // obj
-		}, " ")), // resource identifier
-		)
+		list = append(list, strings.TrimSpace(
+			strings.Join([]string{
+				p[3], // act
+				p[2], // obj
+			}, " "),
+		))
 	}
 	// 返回结果
 	c.JSON(http.StatusOK, &web.Response{
@@ -121,7 +123,7 @@ func AllocDomainRoleResources(c *gin.Context) {
 		var rules [][]string
 		for _, id := range req.Identifiers {
 			// 资源identifier的格式检查
-			obj, act, err := strs.ValidateResourceIdentifier(-1, id)
+			val, err := strs.ValidateResourceIdentifier(-1, id)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, &web.Response{
 					Code: web.ResponseCode_RequestError,
@@ -129,7 +131,30 @@ func AllocDomainRoleResources(c *gin.Context) {
 				})
 				return
 			}
-			rules = append(rules, []string{rxid, dxid, obj, act})
+			// 检查应用服务是否有该资源
+			var identifier string
+			switch val.Type {
+			case 1, 2: // 菜单/控件
+				identifier = val.Obj
+			case 3: // API
+				identifier = strings.Join([]string{val.Act, val.Obj}, " ")
+			}
+			result, err := resource.FirstByIdentifier(identifier)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, &web.Response{
+					Code: web.ResponseCode_InternalError,
+					Msg:  err.Error(),
+				})
+				return
+			}
+			if result == nil {
+				c.JSON(http.StatusBadRequest, &web.Response{
+					Code: web.ResponseCode_RequestError,
+					Msg:  fmt.Sprintf("资源不存在：%s", identifier),
+				})
+				return
+			}
+			rules = append(rules, []string{rxid, dxid, val.Obj, val.Act})
 		}
 		if _, err := casbin.Enforcer.AddPoliciesEx(rules); err != nil {
 			c.JSON(http.StatusInternalServerError, &web.Response{
@@ -218,14 +243,14 @@ func AllocRoleInDomain(c *gin.Context) {
 		return
 	}
 	if user == nil {
-		c.JSON(http.StatusUnauthorized, &web.Response{
+		c.JSON(http.StatusForbidden, &web.Response{
 			Code: web.ResponseCode_RequestError,
 			Msg:  "无有效的用户信息",
 		})
 		return
 	}
 	if user.Email == config.AppConfig.Root.Email {
-		c.JSON(http.StatusUnauthorized, &web.Response{
+		c.JSON(http.StatusForbidden, &web.Response{
 			Code: web.ResponseCode_RequestError,
 			Msg:  "权限不够",
 		})

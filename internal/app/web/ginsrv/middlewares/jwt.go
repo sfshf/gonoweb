@@ -21,7 +21,7 @@ func Jwt() gin.HandlerFunc {
 		// 1. 检查Authorization头部
 		token := strings.TrimPrefix(c.GetHeader("Authorization"), jwt.BearerPrefix)
 		if token == "" {
-			c.JSON(http.StatusUnauthorized, &web.Response{
+			c.JSON(http.StatusBadRequest, &web.Response{
 				Code: web.ResponseCode_RequestError,
 				Msg:  "Authorization头部为空",
 			})
@@ -30,7 +30,7 @@ func Jwt() gin.HandlerFunc {
 		}
 		// 2. 检查用户的token是否是本人当前所在IP上使用的
 		if err := user.CheckTokenWithIP(token, c.ClientIP()); err != nil {
-			c.JSON(http.StatusUnauthorized, &web.Response{
+			c.JSON(http.StatusForbidden, &web.Response{
 				Code: web.ResponseCode_RequestError,
 				Msg:  err.Error(),
 			})
@@ -46,7 +46,7 @@ func Jwt() gin.HandlerFunc {
 					Msg:  "登录token过期，请重新登录",
 				})
 			} else {
-				c.JSON(http.StatusUnauthorized, &web.Response{
+				c.JSON(http.StatusForbidden, &web.Response{
 					Code: web.ResponseCode_RequestError,
 					Msg:  err.Error(),
 				})

@@ -7,59 +7,93 @@ import (
 	"strings"
 )
 
-func ValidateResourceIdentifier(typ int32, identifier string) (string, string, error) {
+type ResourceIdentifier struct {
+	Type int32  `json:"type"`
+	Obj  string `json:"obj"`
+	Act  string `json:"act"`
+}
+
+func ValidateResourceIdentifier(typ int32, identifier string) (*ResourceIdentifier, error) {
 	switch typ {
-	case 1: // menu
+	case 1: // menu新增情况，typ=1
 		matched, err := regexp.MatchString(`^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, identifier)
 		if err != nil {
-			return "", "", err
+			return nil, err
 		}
 		if !matched {
-			return "", "", errors.New("menu identifier must be `^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
-		}
-		return identifier, "", nil
-	case 2: // widget
-		matched, err := regexp.MatchString(`^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`, identifier)
-		if err != nil {
-			return "", "", err
-		}
-		if !matched {
-			return "", "", errors.New("widget identifier must be `^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`")
-		}
-		return identifier, "", nil
-	case 3: // api
-		matched, err := regexp.MatchString(`^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, identifier)
-		if err != nil {
-			return "", "", err
-		}
-		if !matched {
-			return "", "", errors.New("API identifier must be `^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
+			return nil, errors.New("menu identifier must be `^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
 		}
 		splits := strings.Split(identifier, " ")
-		return splits[1], splits[0], nil
-	default:
-		matched, err := regexp.MatchString(`^/([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, identifier)
+		return &ResourceIdentifier{
+			Type: typ,
+			Obj:  splits[1],
+			Act:  splits[0],
+		}, nil
+	case 2: // widget新增情况，typ=2
+		matched, err := regexp.MatchString(`^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`, identifier)
 		if err != nil {
-			return "", "", err
+			return nil, err
 		}
-		if matched {
-			return identifier, "", nil
+		if !matched {
+			return nil, errors.New("widget identifier must be `^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`")
 		}
-		matched, err = regexp.MatchString(`^[A-Za-z0-9]+(_[A-Za-z0-9]+)*$`, identifier)
+		splits := strings.Split(identifier, " ")
+		return &ResourceIdentifier{
+			Type: typ,
+			Obj:  splits[1],
+			Act:  splits[0],
+		}, nil
+	case 3: // api新增情况，typ=3
+		matched, err := regexp.MatchString(`^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, identifier)
 		if err != nil {
-			return "", "", err
+			return nil, err
 		}
-		if matched {
-			return identifier, "", nil
+		if !matched {
+			return nil, errors.New("API identifier must be `^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`")
 		}
-		matched, err = regexp.MatchString(`^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/:?[A-Za-z0-9_-]+)*$`, identifier)
+		splits := strings.Split(identifier, " ")
+		return &ResourceIdentifier{
+			Type: typ,
+			Obj:  splits[1],
+			Act:  splits[0],
+		}, nil
+	default: // 资源授权情况，typ=-1
+		matched, err := regexp.MatchString(`^(read|write) /([A-Za-z0-9_-]+)(/[A-Za-z0-9_-]+)*$`, identifier)
 		if err != nil {
-			return "", "", err
+			return nil, err
 		}
 		if matched {
 			splits := strings.Split(identifier, " ")
-			return splits[1], splits[0], nil
+			return &ResourceIdentifier{
+				Type: 1,
+				Obj:  splits[1],
+				Act:  splits[0],
+			}, nil
 		}
-		return "", "", fmt.Errorf("unsupported identifier format: %s", identifier)
+		matched, err = regexp.MatchString(`^(read|write) [A-Za-z0-9]+(_[A-Za-z0-9]+)*$`, identifier)
+		if err != nil {
+			return nil, err
+		}
+		if matched {
+			splits := strings.Split(identifier, " ")
+			return &ResourceIdentifier{
+				Type: 2,
+				Obj:  splits[1],
+				Act:  splits[0],
+			}, nil
+		}
+		matched, err = regexp.MatchString(`^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) /([A-Za-z0-9_-]+)(/:?[A-Za-z0-9_-]+)*$`, identifier)
+		if err != nil {
+			return nil, err
+		}
+		if matched {
+			splits := strings.Split(identifier, " ")
+			return &ResourceIdentifier{
+				Type: 3,
+				Obj:  splits[1],
+				Act:  splits[0],
+			}, nil
+		}
+		return nil, fmt.Errorf("unsupported identifier format: %s", identifier)
 	}
 }

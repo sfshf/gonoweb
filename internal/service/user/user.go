@@ -3,20 +3,22 @@ package user
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/rs/xid"
 	"github.com/sfshf/gonoweb/internal/config"
 	"github.com/sfshf/gonoweb/internal/model"
 	. "github.com/sfshf/gonoweb/internal/model"
 	"github.com/sfshf/gonoweb/internal/repo"
-	"github.com/sfshf/gonoweb/internal/repo/casbin"
 	"github.com/sfshf/gonoweb/internal/repo/domain"
 	"github.com/sfshf/gonoweb/internal/repo/resource"
 	"github.com/sfshf/gonoweb/internal/repo/role"
 	"github.com/sfshf/gonoweb/internal/repo/user"
 	. "github.com/sfshf/gonoweb/internal/service"
+	"github.com/sfshf/gonoweb/internal/service/casbin"
 	"github.com/sfshf/gonoweb/internal/util/crypto"
 	"github.com/sfshf/gonoweb/internal/util/jwt"
+	"github.com/sfshf/gonoweb/internal/util/strs"
 )
 
 func Launch() (func(), error) {
@@ -169,13 +171,26 @@ func signIn_NonRoot(userM *model.TUser, userInfo ...string) (*SignInData, *SvcEr
 	}
 	var domainXid string
 	var roleXid string
-	if userAgent == nil {
-		// 用户首次登录，获取用户可获得的第一个域租户的第一个角色，以及角色资源
-		gRule, err := casbin.FirstGByRsub(userM.Xid)
+	if userAgent != nil {
+		// 解析用户token
+		claims, err := jwt.ParseToken(
+			jwt.DefaultSigningMethod,
+			config.AppConfig.Gin.Jwt.SigningKey,
+			userAgent.Token,
+		)
 		if err != nil {
 			return nil, &SvcErr{Internal: true, Err: err}
 		}
-		if gRule == nil {
+		domainXid = claims.Domain
+		roleXid = claims.Role
+	}
+	if domainXid == "" || roleXid == "" {
+		// 用户首次登录，获取用户可获得的第一个域租户的第一个角色，以及角色资源
+		domains, err := casbin.Enforcer.GetDomainsForUser(userM.Xid)
+		if err != nil {
+			return nil, &SvcErr{Internal: true, Err: err}
+		}
+		if len(domains) == 0 {
 			// 用户没有配给任何域租户、角色、资源
 			token, err := jwt.GenerateToken(
 				jwt.DefaultSigningMethod,
@@ -207,20 +222,11 @@ func signIn_NonRoot(userM *model.TUser, userInfo ...string) (*SignInData, *SvcEr
 				User:  userM,
 			}, nil
 		}
-		roleXid = gRule.V1
-		domainXid = gRule.V2
-	} else {
-		// 解析用户token
-		claims, err := jwt.ParseToken(
-			jwt.DefaultSigningMethod,
-			config.AppConfig.Gin.Jwt.SigningKey,
-			userAgent.Token,
-		)
-		if err != nil {
-			return nil, &SvcErr{Internal: true, Err: err}
+		domainXid = domains[0]
+		roles := casbin.Enforcer.GetRolesForUserInDomain(userM.Xid, domainXid)
+		if len(roles) > 0 {
+			roleXid = roles[0]
 		}
-		domainXid = claims.Domain
-		roleXid = claims.Role
 	}
 	// 获取用户域租户信息、角色信息、资源信息
 	domain, err := domain.FirstByXid(domainXid)
@@ -232,7 +238,30 @@ func signIn_NonRoot(userM *model.TUser, userInfo ...string) (*SignInData, *SvcEr
 		return nil, &SvcErr{Internal: true, Err: err}
 	}
 	// 获取用户当前域角色的资源
-	menuWidgets, err := resource.FindMenuWidgetsByDomainAndRole(domain.Xid, role.Xid)
+	policies, err := casbin.Enforcer.GetFilteredPolicy(0, role.Xid, domain.Xid)
+	if err != nil {
+		return nil, &SvcErr{Internal: true, Err: err}
+	}
+	var identifiers []string
+	for _, p := range policies {
+		actObj := strings.TrimSpace(
+			strings.Join([]string{
+				p[3], // act
+				p[2], // obj
+			}, " "),
+		)
+		ri, err := strs.ValidateResourceIdentifier(-1, actObj)
+		if err != nil {
+			return nil, &SvcErr{Internal: true, Err: err}
+		}
+		switch ri.Type {
+		case 1, 2: // 菜单/控件
+			identifiers = append(identifiers, ri.Obj)
+		case 3: // API
+			identifiers = append(identifiers, actObj)
+		}
+	}
+	menuWidgets, err := resource.FindMenuWidgetsByIdentifiers(identifiers)
 	if err != nil {
 		return nil, &SvcErr{Internal: true, Err: err}
 	}

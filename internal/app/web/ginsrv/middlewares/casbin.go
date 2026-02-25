@@ -43,7 +43,7 @@ func Casbin() gin.HandlerFunc {
 			return
 		}
 		if user == nil {
-			c.JSON(http.StatusUnauthorized, &web.Response{
+			c.JSON(http.StatusBadRequest, &web.Response{
 				Code: web.ResponseCode_RequestError,
 				Msg:  "无有效的用户信息",
 			})
@@ -65,7 +65,7 @@ func Casbin() gin.HandlerFunc {
 			return
 		}
 		if !authorized {
-			c.JSON(http.StatusUnauthorized, &web.Response{
+			c.JSON(http.StatusForbidden, &web.Response{
 				Code: web.ResponseCode_RequestError,
 				Msg:  "用户无权访问",
 			})

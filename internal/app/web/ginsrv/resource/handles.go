@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sfshf/gonoweb/internal/app/web"
@@ -152,7 +153,8 @@ func AddResource(c *gin.Context) {
 		return
 	}
 	// 检查identifer的格式
-	if _, _, err := strs.ValidateResourceIdentifier(req.Type, req.Identifier); err != nil {
+	val, err := strs.ValidateResourceIdentifier(req.Type, req.Identifier)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, &web.Response{
 			Code: web.ResponseCode_RequestError,
 			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
@@ -160,9 +162,16 @@ func AddResource(c *gin.Context) {
 		return
 	}
 	// 调用服务
+	var id string
+	switch val.Type {
+	case 1, 2: // 菜单/控件
+		id = val.Obj
+	case 3: // API
+		id = strings.Join([]string{val.Act, val.Obj}, " ")
+	}
 	result, svcErr := resource.AddResource(
 		req.Type,
-		req.Identifier,
+		id,
 		req.Name,
 		req.Intro,
 		req.Icon,

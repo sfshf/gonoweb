@@ -20,7 +20,7 @@ func FindAllMenuWidgets() ([]TResource, error) {
 	var list []TResource
 	if err := repo.GormDB.
 		Table(TableNameTResource).
-		Where("(t_resource.type=? OR t_resource.type=?)",
+		Where("(type=? OR type=?)",
 			ResourceType_Menu,
 			ResourceType_Widget,
 		).
@@ -31,20 +31,17 @@ func FindAllMenuWidgets() ([]TResource, error) {
 	return list, nil
 }
 
-func FindMenuWidgetsByDomainAndRole(domain, role string) ([]TResource, error) {
+func FindMenuWidgetsByIdentifiers(identifiers []string) ([]TResource, error) {
 	var list []TResource
 	if err := repo.GormDB.
 		Table(TableNameTResource).
-		Joins(`LEFT JOIN t_casbin_rule ON t_resource.identifier=t_casbin_rule.v2`).
-		Where("t_casbin_rule.ptype=?", "p").
-		Where("t_casbin_rule.v0=?", role).
-		Where("t_casbin_rule.v1=?", domain).
-		Where("t_casbin_rule.v3=''").
-		Where("(t_resource.type=? OR t_resource.type=?)",
+		// TODO 解决identifiers数组太长，导致SQL的IN语句失效的问题
+		Where("identifier IN (?)", identifiers).
+		Where("(type=? OR type=?)",
 			ResourceType_Menu,
 			ResourceType_Widget,
 		).
-		Where(`t_resource.deleted_at=0`).
+		Where(`deleted_at=0`).
 		Find(&list).Error; err != nil {
 		return nil, err
 	}
@@ -56,6 +53,22 @@ func FirstByID(id int64) (*TResource, error) {
 	if err := repo.GormDB.
 		Table(TableNameTResource).
 		Where("id=?", id).
+		Where(`deleted_at=0`).
+		First(&record).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		} else {
+			return nil, err
+		}
+	}
+	return &record, nil
+}
+
+func FirstByIdentifier(identifier string) (*TResource, error) {
+	var record TResource
+	if err := repo.GormDB.
+		Table(TableNameTResource).
+		Where("identifier=?", identifier).
 		Where(`deleted_at=0`).
 		First(&record).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
