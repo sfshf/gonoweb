@@ -140,7 +140,12 @@
       "roles": "Role List",
       "menus": "Menu List",
       "widgets": "Widget List",
-      "apis": "API List"
+      "apis": "API List",
+      "read": "read",
+      "write": "write"
+    },
+    "placeholder": {
+      "none": "none"
     }
   },
   "alloc_role": {

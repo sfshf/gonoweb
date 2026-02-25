@@ -140,7 +140,12 @@
       "roles": "角色列表",
       "menus": "菜单列表",
       "widgets": "控件列表",
-      "apis": "接口列表"
+      "apis": "接口列表",
+      "read": "读",
+      "write": "写"
+    },
+    "placeholder": {
+      "none": "无"
     }
   },
   "alloc_role": {
