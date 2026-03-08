@@ -30,24 +30,28 @@ func LoadPingHandles_V1(rg *gin.RouterGroup) {
 
 func LoadPubHandles_V1(rg *gin.RouterGroup) {
 	// user group
-	userg := rg.Group("/user")
+	usrg := rg.Group("/user")
 	{
-		userg.POST("/visit", user.Visit)
-		userg.POST("/signIn", user.SignIn)
+		usrg.POST("/visit", user.Visit)
+		usrg.POST("/signIn", user.SignIn)
 	}
 }
 
 func LoadAuthHandles_V1(rg *gin.RouterGroup) {
 	// user group
-	userg := rg.Group("/user")
+	usrg := rg.Group("/user")
 	{
-		userg.POST("/signOut", user.SignOut)
-		userg.GET("/agent", user.ListUserAgent)
-		userg.GET("", user.ListUser)
-		userg.GET("/:xid", user.UserInfo)
-		userg.POST("", user.AddUser)
-		userg.PUT("/:xid", user.EditUser)
-		userg.DELETE("/:xid", user.DeleteUser)
+		usrg.POST("/signOut", user.SignOut)
+		usrg.GET("/agent", user.ListUserAgent)
+		usrg.GET("", user.ListUser)
+		usrg.POST("", user.AddUser)
+		usrg.PUT("", user.SwitchRole)
+		susrg := usrg.Group("/:xid")
+		{
+			susrg.GET("", user.UserInfo)
+			susrg.PUT("", user.EditUser)
+			susrg.DELETE("", user.DeleteUser)
+		}
 	}
 
 	// role group
@@ -71,13 +75,13 @@ func LoadAuthHandles_V1(rg *gin.RouterGroup) {
 	}
 
 	// resource(menu/widget/api) group
-	resourceg := rg.Group("/resource")
+	resg := rg.Group("/resource")
 	{
-		resourceg.GET("", resource.ListResource)
-		resourceg.GET("/:id", resource.ResourceInfo)
-		resourceg.POST("", resource.AddResource)
-		resourceg.PUT("/:id", resource.EditResource)
-		resourceg.DELETE("/:id", resource.DeleteResource)
+		resg.GET("", resource.ListResource)
+		resg.GET("/:id", resource.ResourceInfo)
+		resg.POST("", resource.AddResource)
+		resg.PUT("/:id", resource.EditResource)
+		resg.DELETE("/:id", resource.DeleteResource)
 	}
 
 	// casbin group
@@ -97,7 +101,18 @@ func LoadAuthHandles_V1(rg *gin.RouterGroup) {
 		}
 		usrg := casbing.Group("/user")
 		{
-			usrg.POST("/:xid", casbin.AllocRoleInDomain)
+			susrg := usrg.Group("/:xid")
+			{
+				susrg.POST("", casbin.AllocRoleInDomain)
+				domg := susrg.Group("/domain")
+				{
+					domg.GET("", casbin.UserDomains)
+					roleg := domg.Group("/:dxid/role")
+					{
+						roleg.GET("", casbin.UserRolesInDomain)
+					}
+				}
+			}
 		}
 	}
 }

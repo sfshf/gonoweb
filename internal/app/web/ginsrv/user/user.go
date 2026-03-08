@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sfshf/gonoweb/internal/app/web"
 	"github.com/sfshf/gonoweb/internal/app/web/ginsrv/middlewares"
+	"github.com/sfshf/gonoweb/internal/service/casbin"
 	"github.com/sfshf/gonoweb/internal/service/user"
 	"github.com/sfshf/gonoweb/internal/util/jwt"
 )
@@ -102,6 +103,84 @@ func SignOut(c *gin.Context) {
 	c.JSON(http.StatusOK, &web.Response{
 		Code: web.ResponseCode_OK,
 		Msg:  web.ResponseMsg_OK,
+	})
+}
+
+// SwitchRole 用户切换角色
+// @Summary      用户切换角色
+// @Description  用户切换角色
+// @Tags         用户
+// @Accept       json
+// @Produce      json
+// @Param        Authorization header string false "登录token"
+// @Param        request query SwitchRoleReq false "切换角色所需参数"
+// @Success      200  {object}  user.SignInData
+// @Failure      400  {object}  web.Response
+// @Failure      404  {object}  web.Response
+// @Failure      500  {object}  web.Response
+// @Router       /user [PUT]
+func SwitchRole(c *gin.Context) {
+	// 检查入参
+	var req SwitchRoleReq
+	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", err.Error()),
+		})
+		return
+	}
+	// !IMPORTANT! root账户不需要调用该接口
+	// 检查当前用户有无分配该域租户和角色
+	// 从gin.Context拿取用户信息
+	claims := middlewares.JwtClaims(c)
+	has, err := casbin.Enforcer.HasRoleForUser(claims.Subject, req.Rxid, req.Dxid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, &web.Response{
+			Code: web.ResponseCode_InternalError,
+			Msg:  fmt.Sprintf("系统报错：%s", err.Error()),
+		})
+		return
+	}
+	if !has {
+		c.JSON(http.StatusForbidden, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  "当前用户无权限获取目标资源",
+		})
+		return
+	}
+	// IP  from HTTP headers
+	ip := c.ClientIP()
+	// User-Agent from HTTP headers
+	ua := c.GetHeader("User-Agent")
+	// TracdID from HTTP headers
+	tid := c.GetHeader(middlewares.HeaderKey_TraceID)
+	if tid == "" {
+		tid = c.GetString(middlewares.HeaderKey_TraceID)
+	}
+	// 调用服务
+	data, svcErr := user.SwitchRole(claims.Subject, req.Dxid, req.Rxid, ip, ua, tid)
+	if svcErr != nil {
+		if svcErr.Internal {
+			c.JSON(http.StatusInternalServerError, &web.Response{
+				Code: web.ResponseCode_InternalError,
+				Msg:  fmt.Sprintf("系统报错：%s", svcErr.Error()),
+			})
+			return
+		} else {
+			c.JSON(http.StatusBadRequest, &web.Response{
+				Code: web.ResponseCode_RequestError,
+				Msg:  fmt.Sprintf("切换角色失败：%s", svcErr.Error()),
+			})
+			return
+		}
+	}
+	// 将jwt写入头部
+	c.Header("Authorization", jwt.BearerPrefix+data.Token)
+	// 返回结果
+	c.JSON(http.StatusOK, &web.Response{
+		Code: web.ResponseCode_OK,
+		Msg:  web.ResponseMsg_OK,
+		Data: data,
 	})
 }
 

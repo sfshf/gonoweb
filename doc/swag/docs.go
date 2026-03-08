@@ -231,12 +231,122 @@ const docTemplate = `{
                         "in": "header"
                     },
                     {
+                        "type": "string",
+                        "description": "用户的xid",
+                        "name": "xid",
+                        "in": "path"
+                    },
+                    {
                         "description": "分配所需参数",
                         "name": "request",
                         "in": "body",
                         "schema": {
                             "$ref": "#/definitions/internal_app_web_ginsrv_casbin.AllocRolesInDomainReq"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/casbin/user/:xid/domain": {
+            "get": {
+                "description": "用户被分配到的域租户列表",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "用户被分配到的域租户列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "用户的xid",
+                        "name": "xid",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/casbin/user/:xid/domain/:dxid/role": {
+            "get": {
+                "description": "用户在域租户内的角色列表",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Casbin"
+                ],
+                "summary": "用户在域租户内的角色列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "用户的xid",
+                        "name": "xid",
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -1225,6 +1335,65 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/internal_app_web_ginsrv_user.ListUserResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "用户切换角色",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "用户切换角色",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登录token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "name": "dxid",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "rxid",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sfshf_gonoweb_internal_service_user.SignInData"
                         }
                     },
                     "400": {

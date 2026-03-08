@@ -323,6 +323,130 @@ func SignOut(token string) error {
 	return user.UserAgent_DeleteByToken(token)
 }
 
+func SwitchRole(uxid, dxid, rxid string, userInfo ...string) (*SignInData, *SvcErr) {
+	var err error
+	// 从用户最近使用的token里分析出用户最近使用的域租户和角色
+	var userAgent *model.TUserAgent
+	var ip string
+	if len(userInfo) > 0 {
+		ip = userInfo[0]
+	}
+	if ip != "" {
+		userAgent, err = user.UserAgent_FirstByUserXidAndIP(uxid, ip)
+		if err != nil {
+			return nil, &SvcErr{Internal: true, Err: err}
+		}
+		if userAgent == nil {
+			userAgent, err = user.UserAgent_FirstByUserXid(uxid)
+			if err != nil {
+				return nil, &SvcErr{Internal: true, Err: err}
+			}
+		}
+	} else {
+		userAgent, err = user.UserAgent_FirstByUserXid(uxid)
+		if err != nil {
+			return nil, &SvcErr{Internal: true, Err: err}
+		}
+	}
+	if userAgent == nil {
+		return nil, &SvcErr{Internal: false, Err: errors.New("未找到用户登录信息")}
+	}
+	// 获取用户信息、域租户信息、角色信息、资源信息
+	user, err := user.User_FirstByXid(uxid)
+	if err != nil {
+		return nil, &SvcErr{Internal: true, Err: err}
+	}
+	if user == nil {
+		return nil, &SvcErr{Internal: false, Err: errors.New("未找到用户信息")}
+	}
+	domain, err := domain.FirstByXid(dxid)
+	if err != nil {
+		return nil, &SvcErr{Internal: true, Err: err}
+	}
+	if domain == nil {
+		return nil, &SvcErr{Internal: false, Err: errors.New("未找到目标域租户信息")}
+	}
+	role, err := role.FirstByXid(rxid)
+	if err != nil {
+		return nil, &SvcErr{Internal: true, Err: err}
+	}
+	if role == nil {
+		return nil, &SvcErr{Internal: false, Err: errors.New("未找到目标角色信息")}
+	}
+	// 获取用户当前域角色的资源
+	policies, err := casbin.Enforcer.GetFilteredPolicy(0, role.Xid, domain.Xid)
+	if err != nil {
+		return nil, &SvcErr{Internal: true, Err: err}
+	}
+	var identifiers []string
+	for _, p := range policies {
+		actObj := strings.TrimSpace(
+			strings.Join([]string{
+				p[3], // act
+				p[2], // obj
+			}, " "),
+		)
+		ri, err := strs.ValidateResourceIdentifier(-1, actObj)
+		if err != nil {
+			return nil, &SvcErr{Internal: true, Err: err}
+		}
+		switch ri.Type {
+		case 1, 2: // 菜单/控件
+			identifiers = append(identifiers, ri.Obj)
+		case 3: // API
+			identifiers = append(identifiers, actObj)
+		}
+	}
+	menuWidgets, err := resource.FindMenuWidgetsByIdentifiers(identifiers)
+	if err != nil {
+		return nil, &SvcErr{Internal: true, Err: err}
+	}
+	var menus []model.TResource
+	var widgets []model.TResource
+	for _, item := range menuWidgets {
+		switch item.Type {
+		case resource.ResourceType_Menu:
+			menus = append(menus, item)
+		case resource.ResourceType_Widget:
+			widgets = append(widgets, item)
+		}
+	}
+	// 生成登录token
+	token, err := jwt.GenerateToken(
+		jwt.DefaultSigningMethod,
+		config.AppConfig.Gin.Jwt.SigningKey,
+		jwt.NewJwtClaims(
+			uxid,
+			domain.Xid,
+			role.Xid,
+			config.AppConfig.Gin.Jwt.Expired,
+		),
+	)
+	if err != nil {
+		return nil, &SvcErr{Internal: true, Err: err}
+	}
+	// 将新token更新到t_user_agent表
+	var ua string
+	if len(userInfo) > 1 {
+		ua = userInfo[1]
+	}
+	var tid string
+	if len(userInfo) > 2 {
+		tid = userInfo[2]
+	}
+	if err := UpsertUserAgent(ip, ua, tid, uxid, token); err != nil {
+		return nil, &SvcErr{Internal: true, Err: err}
+	}
+	return &SignInData{
+		Token:   token,
+		User:    user,
+		Domain:  domain,
+		Role:    role,
+		Menus:   menus,
+		Widgets: widgets,
+	}, nil
+}
+
 func ListUser(page, pageSize int, wheres map[string][]any) ([]TUser, int64, *SvcErr) {
 	db := repo.GormDB.Table(TableNameTUser)
 	for query, args := range wheres {

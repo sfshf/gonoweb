@@ -422,6 +422,10 @@ paths:
         in: header
         name: Authorization
         type: string
+      - description: 用户的xid
+        in: path
+        name: xid
+        type: string
       - description: 分配所需参数
         in: body
         name: request
@@ -445,6 +449,74 @@ paths:
           schema:
             $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
       summary: 给用户分配域租户内的角色
+      tags:
+      - Casbin
+  /casbin/user/:xid/domain:
+    get:
+      consumes:
+      - text/plain
+      description: 用户被分配到的域租户列表
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 用户的xid
+        in: path
+        name: xid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 用户被分配到的域租户列表
+      tags:
+      - Casbin
+  /casbin/user/:xid/domain/:dxid/role:
+    get:
+      consumes:
+      - text/plain
+      description: 用户在域租户内的角色列表
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - description: 用户的xid
+        in: path
+        name: xid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 用户在域租户内的角色列表
       tags:
       - Casbin
   /domain:
@@ -1124,6 +1196,45 @@ paths:
           schema:
             $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
       summary: 新增用户
+      tags:
+      - 用户
+    put:
+      consumes:
+      - application/json
+      description: 用户切换角色
+      parameters:
+      - description: 登录token
+        in: header
+        name: Authorization
+        type: string
+      - in: query
+        name: dxid
+        required: true
+        type: string
+      - in: query
+        name: rxid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_service_user.SignInData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sfshf_gonoweb_internal_app_web.Response'
+      summary: 用户切换角色
       tags:
       - 用户
   /user/:xid:

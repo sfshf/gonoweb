@@ -37,6 +37,7 @@ VALUES (1, "/user", "user menu", "用户页", ""), -- 用户相关菜单
 (3, "POST /api/v1/user/visit", "user visit api", "用户首次访问时传递用户代理等信息", ""), -- 用户相关API
 (3, "POST /api/v1/user/sign-in", "user sign-in api", "用户登录", ""),
 (3, "POST /api/v1/user/sign-out", "user sign-out api", "用户登出", ""),
+(3, "PUT /api/v1/user", "user switch role api", "用户切换角色", ""),
 (3, "POST /api/v1/user", "add user api", "新增用户", ""),
 (3, "GET /api/v1/user", "get user list api", "获取用户列表", ""),
 (3, "GET /api/v1/user/:xid", "get user api", "获取用户信息", ""),
@@ -55,8 +56,15 @@ VALUES (1, "/user", "user menu", "用户页", ""), -- 用户相关菜单
 (3, "PUT /api/v1/role/:xid", "update role api", "更新角色信息", ""),
 (3, "DELETE /api/v1/role/:xid", "delete role api", "删除角色", ""),
 
-(3, "POST /api/v1/resource", "add resource api", "新增资源（菜单/控件/API）", ""),  -- 资源（菜单/控件/API）相关相关API
+(3, "POST /api/v1/resource", "add resource api", "新增资源（菜单/控件/API）", ""),  -- 资源（菜单/控件/API）相关API
 (3, "GET /api/v1/resource", "get resource list api", "获取资源（菜单/控件/API）列表", ""),
 (3, "GET /api/v1/resource/:id", "get resource api", "获取资源（菜单/控件/API）信息", ""),
 (3, "PUT /api/v1/resource/:id", "update resource api", "更新资源（菜单/控件/API）信息", ""),
-(3, "DELETE /api/v1/resource/:id", "delete resource api", "删除资源（菜单/控件/API）", "");
+(3, "DELETE /api/v1/resource/:id", "delete resource api", "删除资源（菜单/控件/API）", ""),
+
+(3, "GET /api/v1/casbin/domain/:dxid/role", "list role xids in the domain", "获取域租户下的角色配置", ""),  -- casbin相关API
+(3, "GET /api/v1/casbin/domain/:dxid/role/:rxid/resource", "list resource xids of the role in the domain", "获取域租户下角色的资源配置", ""),
+(3, "POST /api/v1/casbin/domain/:dxid/role/:rxid/resource", "alloc resources to the role in the domain", "给域租户下的角色分配资源", ""),
+(3, "POST /api/v1/casbin/user/:xid", "alloc roles in the domain to the user", "给用户分配域租户下的角色", ""),
+(3, "GET /api/v1/casbin/user/:xid/domain", "get domain xids of the user", "获取用户被分配到的域租户列表", ""),
+(3, "GET /api/v1/casbin/user/:xid/domain/:dxid/role", "get role xids in the domain of the user", "获取用户在域租户下被分配到的角色列表", "");

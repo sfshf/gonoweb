@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sfshf/gonoweb/internal/app/web"
 	"github.com/sfshf/gonoweb/internal/config"
+	"github.com/sfshf/gonoweb/internal/repo/domain"
 	"github.com/sfshf/gonoweb/internal/repo/resource"
 	"github.com/sfshf/gonoweb/internal/repo/user"
 	"github.com/sfshf/gonoweb/internal/service/casbin"
@@ -112,13 +113,6 @@ func AllocDomainRoleResources(c *gin.Context) {
 		})
 		return
 	}
-	if _, err := casbin.Enforcer.RemoveFilteredPolicy(0, rxid, dxid); err != nil {
-		c.JSON(http.StatusInternalServerError, &web.Response{
-			Code: web.ResponseCode_InternalError,
-			Msg:  err.Error(),
-		})
-		return
-	}
 	if len(req.Identifiers) > 0 {
 		var rules [][]string
 		for _, id := range req.Identifiers {
@@ -156,7 +150,22 @@ func AllocDomainRoleResources(c *gin.Context) {
 			}
 			rules = append(rules, []string{rxid, dxid, val.Obj, val.Act})
 		}
+		if _, err := casbin.Enforcer.RemoveFilteredPolicy(0, rxid, dxid); err != nil {
+			c.JSON(http.StatusInternalServerError, &web.Response{
+				Code: web.ResponseCode_InternalError,
+				Msg:  err.Error(),
+			})
+			return
+		}
 		if _, err := casbin.Enforcer.AddPoliciesEx(rules); err != nil {
+			c.JSON(http.StatusInternalServerError, &web.Response{
+				Code: web.ResponseCode_InternalError,
+				Msg:  err.Error(),
+			})
+			return
+		}
+	} else {
+		if _, err := casbin.Enforcer.RemoveFilteredPolicy(0, rxid, dxid); err != nil {
 			c.JSON(http.StatusInternalServerError, &web.Response{
 				Code: web.ResponseCode_InternalError,
 				Msg:  err.Error(),
@@ -217,6 +226,7 @@ func DomainRoles(c *gin.Context) {
 // @Accept       plain
 // @Produce      json
 // @Param        Authorization header string false "登录token"
+// @Param        xid path string false "用户的xid"
 // @Param        request body AllocRolesInDomainReq false "分配所需参数"
 // @Success      200  {object}  nil
 // @Failure      400  {object}  web.Response
@@ -286,5 +296,158 @@ func AllocRoleInDomain(c *gin.Context) {
 	c.JSON(http.StatusOK, &web.Response{
 		Code: web.ResponseCode_OK,
 		Msg:  web.ResponseMsg_OK,
+	})
+}
+
+// UserDomains 用户被分配到的域租户列表
+// @Summary      用户被分配到的域租户列表
+// @Description  用户被分配到的域租户列表
+// @Tags         Casbin
+// @Accept       plain
+// @Produce      json
+// @Param        Authorization header string false "登录token"
+// @Param        xid path string false "用户的xid"
+// @Success      200  {object}  nil
+// @Failure      400  {object}  web.Response
+// @Failure      404  {object}  web.Response
+// @Failure      500  {object}  web.Response
+// @Router       /casbin/user/:xid/domain [GET]
+func UserDomains(c *gin.Context) {
+	// 检查入参
+	xid := c.Param("xid")
+	if xid == "" {
+		c.JSON(http.StatusBadRequest, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", "用户xid为空"),
+		})
+		return
+	}
+	// 如果是root账户
+	user, err := user.User_FirstByXid(xid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, &web.Response{
+			Code: web.ResponseCode_InternalError,
+			Msg:  err.Error(),
+		})
+		return
+	}
+	if user == nil {
+		c.JSON(http.StatusForbidden, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  "无有效的用户信息",
+		})
+		return
+	}
+	if user.Email == config.AppConfig.Root.Email {
+		// 返回当前所有域租户列表
+		list, err := casbin.Enforcer.GetAllDomains()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, &web.Response{
+				Code: web.ResponseCode_InternalError,
+				Msg:  err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusForbidden, &web.Response{
+			Code: web.ResponseCode_OK,
+			Msg:  web.ResponseMsg_OK,
+			Data: list,
+		})
+		return
+	}
+	// 获取目标用户分配的域租户列表
+	list, err := casbin.Enforcer.GetDomainsForUser(user.Xid)
+	c.JSON(http.StatusOK, &web.Response{
+		Code: web.ResponseCode_OK,
+		Msg:  web.ResponseMsg_OK,
+		Data: list,
+	})
+}
+
+// UserRolesInDomain 用户在域租户内的角色列表
+// @Summary      用户在域租户内的角色列表
+// @Description  用户在域租户内的角色列表
+// @Tags         Casbin
+// @Accept       plain
+// @Produce      json
+// @Param        Authorization header string false "登录token"
+// @Param        xid path string false "用户的xid"
+// @Success      200  {object}  nil
+// @Failure      400  {object}  web.Response
+// @Failure      404  {object}  web.Response
+// @Failure      500  {object}  web.Response
+// @Router       /casbin/user/:xid/domain/:dxid/role [GET]
+func UserRolesInDomain(c *gin.Context) {
+	// 检查入参
+	xid := c.Param("xid")
+	if xid == "" {
+		c.JSON(http.StatusBadRequest, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", "用户xid为空"),
+		})
+		return
+	}
+	dxid := c.Param("dxid")
+	if dxid == "" {
+		c.JSON(http.StatusBadRequest, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  fmt.Sprintf("请求参数错误：%s", "域租户dxid为空"),
+		})
+		return
+	}
+	domain, err := domain.FirstByXid(dxid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, &web.Response{
+			Code: web.ResponseCode_InternalError,
+			Msg:  err.Error(),
+		})
+		return
+	}
+	if domain == nil {
+		c.JSON(http.StatusForbidden, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  "无有效的域租户信息",
+		})
+		return
+	}
+	// 如果是root账户
+	user, err := user.User_FirstByXid(xid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, &web.Response{
+			Code: web.ResponseCode_InternalError,
+			Msg:  err.Error(),
+		})
+		return
+	}
+	if user == nil {
+		c.JSON(http.StatusForbidden, &web.Response{
+			Code: web.ResponseCode_RequestError,
+			Msg:  "无有效的用户信息",
+		})
+		return
+	}
+	if user.Email == config.AppConfig.Root.Email {
+		// 返回该域租户下的所有角色列表
+		list, err := casbin.Enforcer.GetAllRolesByDomain(dxid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, &web.Response{
+				Code: web.ResponseCode_InternalError,
+				Msg:  err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusForbidden, &web.Response{
+			Code: web.ResponseCode_OK,
+			Msg:  web.ResponseMsg_OK,
+			Data: list,
+		})
+		return
+	}
+	// 获取目标用户分配在该域租户下的所有角色列表
+	list := casbin.Enforcer.GetRolesForUserInDomain(user.Xid, domain.Xid)
+	c.JSON(http.StatusOK, &web.Response{
+		Code: web.ResponseCode_OK,
+		Msg:  web.ResponseMsg_OK,
+		Data: list,
 	})
 }

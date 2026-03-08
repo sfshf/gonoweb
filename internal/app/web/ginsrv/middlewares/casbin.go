@@ -24,10 +24,18 @@ func Casbin() gin.HandlerFunc {
 		}
 		// 2. 从JWT中间件获取用户xid
 		jwtClaims := JwtClaims(c)
+		if jwtClaims == nil {
+			c.JSON(http.StatusForbidden, &web.Response{
+				Code: web.ResponseCode_RequestError,
+				Msg:  "用户未登录",
+			})
+			c.Abort()
+			return
+		}
 		if jwtClaims.Subject == "" {
-			c.JSON(http.StatusInternalServerError, &web.Response{
-				Code: web.ResponseCode_InternalError,
-				Msg:  "服务组件错误：请检查JWT/Casbin中间件是否正确使用",
+			c.JSON(http.StatusForbidden, &web.Response{
+				Code: web.ResponseCode_RequestError,
+				Msg:  "无效的登录信息",
 			})
 			c.Abort()
 			return

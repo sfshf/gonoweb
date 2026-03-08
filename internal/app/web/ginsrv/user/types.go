@@ -40,3 +40,8 @@ type EditUserReq struct {
 	Email    string `json:"email" binding:"required"`
 	NickName string `json:"nickName" binding:"required"`
 }
+
+type SwitchRoleReq struct {
+	Dxid string `json:"dxid" binding:"required"`
+	Rxid string `json:"rxid" binding:"required"`
+}
