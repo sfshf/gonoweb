@@ -26,7 +26,9 @@ export type AllocDomainRoleResourcesReq = {
   identifiers: string[];
 };
 
-export const allocDomainRoleResources = async (req: AllocDomainRoleResourcesReq): Promise<any> => {
+export const allocDomainRoleResources = async (
+  req: AllocDomainRoleResourcesReq,
+): Promise<any> => {
   const url =
     process.env.NEXT_PUBLIC_API_BASE +
     "/casbin/domain/" +
@@ -45,12 +47,32 @@ export type AllocRoleInDomainReq = {
   rxids: string[];
 };
 
-export const allocRoleInDomain = async (req: AllocRoleInDomainReq): Promise<any> => {
-  const url =
-    process.env.NEXT_PUBLIC_API_BASE +
-    "/casbin/user/" + req.xid;
+export const allocRoleInDomain = async (
+  req: AllocRoleInDomainReq,
+): Promise<any> => {
+  const url = process.env.NEXT_PUBLIC_API_BASE + "/casbin/user/" + req.xid;
   return await postJson(url, {
     domain: req.dxid,
     roles: req.rxids,
   });
+};
+
+export const userDomains = async (xid: string): Promise<any> => {
+  const url =
+    process.env.NEXT_PUBLIC_API_BASE + "/casbin/user/" + xid + "/domain";
+  return await getJson(url);
+};
+
+export const userRolesInDomain = async (
+  xid: string,
+  dxid: string,
+): Promise<any> => {
+  const url =
+    process.env.NEXT_PUBLIC_API_BASE +
+    "/casbin/user/" +
+    xid +
+    "/domain/" +
+    dxid +
+    "/role";
+  return await getJson(url);
 };

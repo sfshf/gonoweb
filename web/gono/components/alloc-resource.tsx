@@ -13,17 +13,19 @@ import {
   ModalFooter,
   Listbox,
   ListboxItem,
-  Image,
   Selection,
   Select,
   SelectItem,
-  SharedSelection,
 } from "@heroui/react";
 import { listRole } from "@/api/role";
 import { useTranslation } from "react-i18next";
-import { TDomain, TResource, TRole, TUser } from "@/zustand/types";
+import { TDomain, TResource, TRole } from "@/zustand/types";
 import { listResource } from "@/api/resource";
-import { allocDomainRoleResources, domainRoleResources, domainRoles } from "@/api/casbin";
+import {
+  allocDomainRoleResources,
+  domainRoleResources,
+  domainRoles,
+} from "@/api/casbin";
 
 type RoleT = TRole & {
   selected: boolean;
@@ -192,7 +194,7 @@ export const AllocResourceModal: FC<AllocResourceModalProps> = ({
       return ["write"];
     }
     return [];
-  }
+  };
   const onPressRole = async (item: RoleT) => {
     try {
       // 获取该域租户下的角色的资源identifier列表
@@ -202,8 +204,8 @@ export const AllocResourceModal: FC<AllocResourceModalProps> = ({
         ownedResources = resp.data ? resp.data : [];
       }
       const menus: ResourceT[] = JSON.parse(JSON.stringify(state.menus));
-      menu:
-      for (const val of menus) { // 菜单
+      menu: for (const val of menus) {
+        // 菜单
         for (let i = 0; i < ownedResources.length; i++) {
           if (ownedResources[i].endsWith(val.identifier)) {
             val.owned = true;
@@ -217,8 +219,8 @@ export const AllocResourceModal: FC<AllocResourceModalProps> = ({
         val.auths = [];
       }
       const widgets: ResourceT[] = JSON.parse(JSON.stringify(state.widgets));
-      widget:
-      for (const val of widgets) { // 控件
+      widget: for (const val of widgets) {
+        // 控件
         for (let i = 0; i < ownedResources.length; i++) {
           if (ownedResources[i].endsWith(val.identifier)) {
             val.owned = true;
@@ -232,8 +234,8 @@ export const AllocResourceModal: FC<AllocResourceModalProps> = ({
         val.auths = [];
       }
       const apis: ResourceT[] = JSON.parse(JSON.stringify(state.apis));
-      api:
-      for (const val of apis) { // API
+      api: for (const val of apis) {
+        // API
         for (let i = 0; i < ownedResources.length; i++) {
           if (val.identifier === ownedResources[i]) {
             val.owned = true;
@@ -288,12 +290,12 @@ export const AllocResourceModal: FC<AllocResourceModalProps> = ({
       }
       const identifiers: string[] = [];
       for (const m of state.menus) {
-        if (m.selected) {
+        if (m.selected && m.auths[0]) {
           identifiers.push(m.auths[0] + " " + m.identifier);
         }
       }
       for (const m of state.widgets) {
-        if (m.selected) {
+        if (m.selected && m.auths[0]) {
           identifiers.push(m.auths[0] + " " + m.identifier);
         }
       }
@@ -406,14 +408,16 @@ export const AllocResourceModal: FC<AllocResourceModalProps> = ({
                     textValue={item.name}
                     endContent={
                       <Select
-                        size="sm"
-                        className="h-[20px] w-[85px]"
+                        size='sm'
+                        className='h-[20px] w-[85px]'
                         placeholder={t("alloc_resource.placeholder.none")}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                           const menus = JSON.parse(JSON.stringify(state.menus));
                           for (const m of menus) {
                             if (m.identifier === item.identifier) {
-                              m.auths = e.target.value ? [e.target.value] as Auths : undefined;
+                              m.auths = e.target.value
+                                ? ([e.target.value] as Auths)
+                                : undefined;
                               m.selected = e.target.value ? true : false;
                               break;
                             }
@@ -423,7 +427,9 @@ export const AllocResourceModal: FC<AllocResourceModalProps> = ({
                         selectedKeys={item.auths}
                       >
                         {auths.map((rw) => (
-                          <SelectItem key={rw}>{t("alloc_resource.label." + rw)}</SelectItem>
+                          <SelectItem key={rw}>
+                            {t("alloc_resource.label." + rw)}
+                          </SelectItem>
                         ))}
                       </Select>
                     }
@@ -459,14 +465,18 @@ export const AllocResourceModal: FC<AllocResourceModalProps> = ({
                     textValue={item.name}
                     endContent={
                       <Select
-                        size="sm"
-                        className="h-[20px] w-[85px]"
+                        size='sm'
+                        className='h-[20px] w-[85px]'
                         placeholder={t("alloc_resource.placeholder.none")}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                          const widgets = JSON.parse(JSON.stringify(state.widgets));
+                          const widgets = JSON.parse(
+                            JSON.stringify(state.widgets),
+                          );
                           for (const m of widgets) {
                             if (m.identifier === item.identifier) {
-                              m.auths = e.target.value ? [e.target.value] as Auths : undefined;
+                              m.auths = e.target.value
+                                ? ([e.target.value] as Auths)
+                                : undefined;
                               m.selected = e.target.value ? true : false;
                               break;
                             }
@@ -476,7 +486,9 @@ export const AllocResourceModal: FC<AllocResourceModalProps> = ({
                         selectedKeys={item.auths}
                       >
                         {auths.map((rw) => (
-                          <SelectItem key={rw}>{t("alloc_resource.label." + rw)}</SelectItem>
+                          <SelectItem key={rw}>
+                            {t("alloc_resource.label." + rw)}
+                          </SelectItem>
                         ))}
                       </Select>
                     }
@@ -506,17 +518,20 @@ export const AllocResourceModal: FC<AllocResourceModalProps> = ({
                 topContent={<div>{t("alloc_resource.label.apis")}</div>}
                 items={state.apis}
                 selectionMode='multiple'
-                selectedKeys={state.apis.map((item: ResourceT) => item.selected ? item.identifier : "")}
+                selectedKeys={state.apis.map((item: ResourceT) =>
+                  item.selected ? item.identifier : "",
+                )}
                 onSelectionChange={(keys: Selection) => {
                   const selects = Array.from(new Set(keys));
-                  const apis: ResourceT[] = JSON.parse(JSON.stringify(state.apis));
+                  const apis: ResourceT[] = JSON.parse(
+                    JSON.stringify(state.apis),
+                  );
                   if (keys === "all") {
                     for (const a of apis) {
                       a.selected = true;
                     }
                   } else {
-                    api:
-                    for (const a of apis) {
+                    api: for (const a of apis) {
                       for (const key of selects) {
                         if (a.identifier === key) {
                           a.selected = true;
@@ -569,10 +584,7 @@ export const AllocResourceModal: FC<AllocResourceModalProps> = ({
               >
                 {t("app.btn.close")}
               </Button>
-              <Button
-                color="primary"
-                onPress={onPressConfirm}
-              >
+              <Button color='primary' onPress={onPressConfirm}>
                 {t("app.btn.confirm")}
               </Button>
             </ModalFooter>

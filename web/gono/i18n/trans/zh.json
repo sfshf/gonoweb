@@ -14,6 +14,7 @@
       "close": "关闭"
     },
     "prompt": {
+      "noSignIn": "无用户登录",
       "tableNoContent": "无数据可展示",
       "ok": "成功",
       "delete": "确认删除 {{target}} ？"
@@ -21,7 +22,8 @@
     "label": {
       "signIn": "登录",
       "signOut": "登出",
-      "search": "搜索"
+      "search": "搜索",
+      "switchRoles": "切换角色（当前为{{domain}}/{{role}}）"
     },
     "lang": {
       "en": "英语",
@@ -153,6 +155,12 @@
     "label": {
       "domains": "域租户列表",
       "roles": "角色列表"
+    }
+  },
+  "switch_roles": {
+    "prompt": {
+      "noSelectedDomain": "无被选中的域租户",
+      "noSelectedRole": "无被选中的角色"
     }
   }
 }

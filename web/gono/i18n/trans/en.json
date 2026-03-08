@@ -14,6 +14,7 @@
       "close": "Close"
     },
     "prompt": {
+      "noSignIn": "No user signed in.",
       "tableNoContent": "No rows to display.",
       "ok": "OK",
       "delete": "Confirm to delete {{target}} ?"
@@ -21,7 +22,8 @@
     "label": {
       "signIn": "Sign In",
       "signOut": "Sign Out",
-      "search": "Search"
+      "search": "Search",
+      "switchRoles": "Switch Roles (current is {{domain}}/{{role}})"
     },
     "lang": {
       "en": "English",
@@ -153,6 +155,12 @@
     "label": {
       "domains": "Domain List",
       "roles": "Role List"
+    }
+  },
+  "switch_roles": {
+    "prompt": {
+      "noSelectedDomain": "No selected domain",
+      "noSelectedRole": "No selected role"
     }
   }
 }

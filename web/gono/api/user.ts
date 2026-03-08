@@ -93,3 +93,24 @@ export const editUser = async (req: EditUserReq): Promise<any> => {
 export const deleteUser = async (xid: string): Promise<any> => {
   return await deleteJson(process.env.NEXT_PUBLIC_API_BASE + "/user/" + xid);
 };
+
+export const switchRole = async (
+  dxid: string,
+  rxid: string,
+): Promise<Object> => {
+  if (dxid == "") {
+    throw new Error(`domain xid is empty`, {
+      cause: "Bad Request",
+    });
+  }
+  if (rxid == "") {
+    throw new Error(`role xid is empty`, {
+      cause: "Bad Request",
+    });
+  }
+  // 发送请求
+  return await putJson(process.env.NEXT_PUBLIC_API_BASE + "/user", {
+    dxid,
+    rxid,
+  });
+};

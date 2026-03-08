@@ -24,13 +24,14 @@ import {
   SearchIcon,
   Logo,
 } from "@/components/icons";
-import { useAuthStore } from "@/zustand/user";
+import { isRoot, useAuthStore } from "@/zustand/user";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
   addToast,
+  useDisclosure,
 } from "@heroui/react";
 import { signOut } from "@/api/user";
 import { AuthStore, TResource } from "@/zustand/types";
@@ -38,6 +39,7 @@ import { User } from "@heroui/react";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { usePathname } from "next/navigation";
+import { SwitchRolesModal } from "./switch-roles";
 
 export const Navbar = () => {
   const { t } = useTranslation();
@@ -46,6 +48,8 @@ export const Navbar = () => {
   const token = useAuthStore((state: AuthStore) => state.token);
   const user = useAuthStore((state: AuthStore) => state.user);
   const menus = useAuthStore((state: AuthStore) => state.menus);
+  const domain = useAuthStore((state: AuthStore) => state.domain);
+  const role = useAuthStore((state: AuthStore) => state.role);
 
   const searchInput = (
     <Input
@@ -88,7 +92,13 @@ export const Navbar = () => {
   const onPressLang = (lang: string) => () => {
     i18next.changeLanguage(lang, (err, t) => {});
   };
-
+  // alloc role to the user
+  const {
+    isOpen: isOpenSwitchRoles,
+    onOpen: onOpenSwitchRoles,
+    onOpenChange: onOpenChangeSwitchRoles,
+    onClose: onCloseSwitchRole,
+  } = useDisclosure();
   return (
     <HeroUINavbar maxWidth='xl' position='sticky'>
       <NavbarContent className='basis-1/5 sm:basis-full' justify='start'>
@@ -180,6 +190,20 @@ export const Navbar = () => {
                 />
               </DropdownTrigger>
               <DropdownMenu aria-label='Static Actions'>
+                {/* root账户无需切换角色菜单 */}
+                {(!isRoot() && (
+                  <DropdownItem
+                    key='switch-roles'
+                    className=''
+                    color='default'
+                    onPress={onOpenSwitchRoles}
+                  >
+                    {t("app.label.switchRoles", {
+                      domain: domain?.name ?? "",
+                      role: role?.name ?? "",
+                    })}
+                  </DropdownItem>
+                )) || <></>}
                 <DropdownItem
                   key='delete'
                   className='text-danger'
@@ -216,6 +240,13 @@ export const Navbar = () => {
           ))}
         </div>
       </NavbarMenu>
+
+      <SwitchRolesModal
+        user={user}
+        isOpen={isOpenSwitchRoles}
+        onOpenChange={onOpenChangeSwitchRoles}
+        onClose={onCloseSwitchRole}
+      />
     </HeroUINavbar>
   );
 };

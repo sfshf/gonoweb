@@ -17,11 +17,13 @@ import {
 } from "@heroui/react";
 import { listRole } from "@/api/role";
 import { useTranslation } from "react-i18next";
-import { TDomain, TRole, TUser } from "@/zustand/types";
+import { AuthStore, TDomain, TResource, TRole, TUser } from "@/zustand/types";
 import { listDomain } from "@/api/domain";
-import { allocRoleInDomain, domainRoles } from "@/api/casbin";
+import { userDomains, userRolesInDomain } from "@/api/casbin";
+import { switchRole } from "@/api/user";
+import { useAuthStore } from "@/zustand/user";
 
-export interface AllocRoleModalProps {
+export interface SwitchRolesModalProps {
   className?: string;
   classNames?: ModalProps["classNames"];
   user: TUser | null;
@@ -33,7 +35,7 @@ export interface AllocRoleModalProps {
   getDisclosureProps?: (props?: any) => any;
 }
 
-export const AllocRoleModal: FC<AllocRoleModalProps> = ({
+export const SwitchRolesModal: FC<SwitchRolesModalProps> = ({
   className,
   classNames,
   user,
@@ -48,10 +50,10 @@ export const AllocRoleModal: FC<AllocRoleModalProps> = ({
         return { ...state, domains: action.value };
       case "roles":
         return { ...state, roles: action.value };
-      case "selectedDomain":
-        return { ...state, selectedDomain: action.value };
       case "ownedRoles":
         return { ...state, ownedRoles: action.value };
+      case "selectedDomain":
+        return { ...state, selectedDomain: action.value };
       case "selectedRoles":
         return { ...state, selectedRoles: action.value };
       default:
@@ -61,13 +63,15 @@ export const AllocRoleModal: FC<AllocRoleModalProps> = ({
   const [state, dispatch] = React.useReducer(reducer, {
     domains: new Set(),
     roles: new Set(),
-    selectedDomain: "",
     ownedRoles: new Set(),
+    selectedDomain: "",
     selectedRoles: new Set(),
   });
-
   const effect = async () => {
     try {
+      if (!user) {
+        throw t("app.prompt.noSignIn");
+      }
       // 获取所有域租户
       let domains: TDomain[] = [];
       let resp: any = await listDomain({
@@ -89,9 +93,22 @@ export const AllocRoleModal: FC<AllocRoleModalProps> = ({
       if (resp && resp.data && resp.data.list) {
         roles = resp.data.list;
       }
+      // 获取用户被分配到的域租户列表
+      let ownedDxids: string[] = [];
+      resp = await userDomains(user.xid);
+      if (resp && resp.data) {
+        ownedDxids = resp.data;
+      }
+      // 过滤域租户列表
+      let ownedDomains: TDomain[] = [];
+      for (let i = 0; i < domains.length; i++) {
+        if (ownedDxids.includes(domains[i].xid)) {
+          ownedDomains.push(domains[i]);
+        }
+      }
       dispatch({
         value: {
-          domains: new Set(domains),
+          domains: new Set(ownedDomains),
           roles: new Set(roles),
         },
       });
@@ -103,19 +120,30 @@ export const AllocRoleModal: FC<AllocRoleModalProps> = ({
       });
     }
   };
+  const role = useAuthStore((state: AuthStore) => state.role);
   const onPressDomain = async (item: TDomain) => {
     try {
+      if (!user) {
+        throw t("app.prompt.noSignIn");
+      }
       // 获取该域租户下的角色的xid列表
-      let ownedRoles: string[] = [];
-      let resp: any = await domainRoles(item.xid);
+      let ownedRxids: string[] = [];
+      let resp: any = await userRolesInDomain(user.xid, item.xid);
       if (resp && resp.data) {
-        ownedRoles = resp.data;
+        ownedRxids = resp.data;
+      }
+      // 过滤角色列表
+      let ownedRoles: TRole[] = [];
+      for (let role of state.roles) {
+        if (ownedRxids.includes(role.xid)) {
+          ownedRoles.push(role);
+        }
       }
       dispatch({
         value: {
           selectedDomain: item.xid,
-          selectedRoles: new Set(ownedRoles),
           ownedRoles: new Set(ownedRoles),
+          selectedRoles: new Set([role?.xid]),
         },
       });
     } catch (e) {
@@ -126,15 +154,42 @@ export const AllocRoleModal: FC<AllocRoleModalProps> = ({
       });
     }
   };
+  // 存储用户信息 -- 当前的角色和域租户，能访问到的菜单和控件
+  const setAuth = useAuthStore((state: AuthStore) => state.setAuth);
   const onPressConfirm = async () => {
     try {
-      if (!user || !state.selectedDomain) {
-        return;
+      if (!user) {
+        throw t("app.prompt.noSignIn");
       }
-      const resp: any = await allocRoleInDomain({
-        xid: user.xid,
-        dxid: state.selectedDomain,
-        rxids: Array.from(state.selectedRoles),
+      if (!state.selectedDomain) {
+        return t("switch_roles.prompt.noSelectedDomain");
+      }
+      if (!state.selectedRoles || state.selectedRoles.size == 0) {
+        return t("switch_roles.prompt.noSelectedRole");
+      }
+      const resp: any = await switchRole(
+        state.selectedDomain,
+        state.selectedRoles.values().next().value,
+      );
+      setAuth(
+        resp.data.token,
+        resp.data.user,
+        resp.data.domain,
+        resp.data.role,
+        resp.data.menus,
+        resp.data.widgets,
+      );
+      // 关闭Modal
+      onClose();
+      // 还原
+      dispatch({
+        value: {
+          domains: new Set(),
+          roles: new Set(),
+          ownedRoles: new Set(),
+          selectedDomain: "",
+          selectedRoles: new Set(),
+        },
       });
       addToast({
         title: t("app.prompt.ok"),
@@ -207,7 +262,7 @@ export const AllocRoleModal: FC<AllocRoleModalProps> = ({
                   </ListboxItem>
                 )}
               </Listbox>
-              {state.selectedDomain && (
+              {state.selectedDomain && state.ownedRoles && (
                 <Listbox
                   classNames={{
                     base: "max-w-xs",
@@ -216,15 +271,15 @@ export const AllocRoleModal: FC<AllocRoleModalProps> = ({
                   aria-label='roles'
                   variant='flat'
                   topContent={<div>{t("alloc_role.label.roles")}</div>}
-                  items={state.roles ?? []}
-                  selectionMode='multiple'
+                  items={state.ownedRoles}
+                  selectionMode='single'
                   selectedKeys={state.selectedRoles}
                   onSelectionChange={(keys: Selection) => {
                     dispatch({
                       type: "selectedRoles",
                       value:
                         keys === "all"
-                          ? state.roles.map((r: TRole) => r.xid)
+                          ? state.ownedRoles.map((r: TRole) => r.xid)
                           : keys,
                     });
                   }}
@@ -253,8 +308,8 @@ export const AllocRoleModal: FC<AllocRoleModalProps> = ({
                     value: {
                       domains: new Set(),
                       roles: new Set(),
-                      selectedDomain: "",
                       ownedRoles: new Set(),
+                      selectedDomain: "",
                       selectedRoles: new Set(),
                     },
                   }); //清空状态

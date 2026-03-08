@@ -207,7 +207,7 @@ const EditUser = ({
   const onPressConfirm = async () => {
     try {
       if (!user) {
-        return;
+        throw t("app.prompt.noSignIn");
       }
       if (!validateEmail(state.email)) {
         return;
@@ -300,7 +300,7 @@ const DeleteUser = ({
   const onPressConfirm = async () => {
     try {
       if (!user) {
-        return;
+        throw t("app.prompt.noSignIn");
       }
       const resp: any = await deleteUser(user.xid);
       addToast({
