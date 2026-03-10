@@ -6,12 +6,12 @@ import {
   NavbarBrand,
   NavbarItem,
   NavbarMenuItem,
+  NavbarMenuToggle,
 } from "@heroui/navbar";
 import { Button } from "@heroui/button";
 import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
-import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
 import React from "react";
@@ -32,6 +32,7 @@ import {
   DropdownItem,
   addToast,
   useDisclosure,
+  Avatar,
 } from "@heroui/react";
 import { signOut } from "@/api/user";
 import { AuthStore, TResource } from "@/zustand/types";
@@ -90,7 +91,7 @@ export const Navbar = () => {
       : [],
   );
   const onPressLang = (lang: string) => () => {
-    i18next.changeLanguage(lang, (err, t) => {});
+    i18next.changeLanguage(lang, (err, t) => { });
   };
   // alloc role to the user
   const {
@@ -99,15 +100,47 @@ export const Navbar = () => {
     onOpenChange: onOpenChangeSwitchRoles,
     onClose: onCloseSwitchRole,
   } = useDisclosure();
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   return (
-    <HeroUINavbar maxWidth='xl' position='sticky'>
+    <HeroUINavbar maxWidth='full' position='sticky' isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent className='basis-1/5 sm:basis-full' justify='start'>
+        <NavbarMenuToggle
+          className="lg:hidden"
+        />
         <NavbarBrand as='li' className='gap-3 max-w-fit'>
           <NextLink className='flex justify-start items-center gap-1' href='/'>
             <Logo />
             <p className='font-bold text-inherit'>GONO</p>
           </NextLink>
         </NavbarBrand>
+        <NavbarMenu>
+          {searchInput}
+          <div className='mx-4 mt-2 flex flex-col gap-2'>
+            {menus &&
+              menus.map((item: TResource) => {
+                const menu = hasMenu(item.identifier);
+                if (!menu) {
+                  return <></>;
+                }
+                return (
+                  <NavbarMenuItem key={menu.href}>
+                    <NextLink
+                      className={clsx(
+                        pathname === menu.href
+                          ? " text-blue-500 font-medium"
+                          : "text-gray-700 hover:text-blue-500 ",
+                      )}
+                      color='foreground'
+                      href={menu.href}
+                      onClick={() => { setIsMenuOpen(false) }}
+                    >
+                      {t("app.menus." + menu.label)}
+                    </NextLink>
+                  </NavbarMenuItem>
+                );
+              })}
+          </div>
+        </NavbarMenu>
         <ul className='hidden lg:flex gap-4 justify-start ml-2'>
           {menus &&
             menus.map((item: TResource) => {
@@ -133,12 +166,11 @@ export const Navbar = () => {
             })}
         </ul>
       </NavbarContent>
-
       <NavbarContent
-        className='hidden sm:flex basis-1/5 sm:basis-full'
+        className='sm:basis-full'
         justify='end'
       >
-        <NavbarItem className='hidden sm:flex gap-2'>
+        <NavbarItem className='flex gap-2'>
           <Link isExternal aria-label='Github' href={siteConfig.links.github}>
             <GithubIcon className='text-default-500' />
           </Link>
@@ -166,7 +198,7 @@ export const Navbar = () => {
           </Dropdown>
         </NavbarItem>
         <NavbarItem className='hidden lg:flex'>{searchInput}</NavbarItem>
-        <NavbarItem className='hidden md:flex'>
+        <NavbarItem className='hidden lg:flex'>
           {!token && (
             <Button
               as={Link}
@@ -215,32 +247,61 @@ export const Navbar = () => {
               </DropdownMenu>
             </Dropdown>
           )}
+
+        </NavbarItem>
+        <NavbarItem className="lg:hidden" >
+          {!token && (
+            <Button
+              as={Link}
+              className='text-sm font-normal text-default-600 bg-default-100'
+              href={siteConfig.links.signIn}
+              startContent={<UserCircleIcon className='text-blue' />}
+              variant='flat'
+            >
+              {t("app.label.signIn")}
+            </Button>
+          )}
+          {token && user && (
+            <Dropdown>
+              <DropdownTrigger>
+                <Avatar
+                  isBordered
+                  as="button"
+                  className="transition-transform"
+                  color="secondary"
+                  name={user.nick_name}
+                  size="sm"
+                  src={user.avatar}
+                />
+              </DropdownTrigger>
+              <DropdownMenu aria-label='Static Actions'>
+                {/* root账户无需切换角色菜单 */}
+                {(!isRoot() && (
+                  <DropdownItem
+                    key='switch-roles'
+                    className=''
+                    color='default'
+                    onPress={onOpenSwitchRoles}
+                  >
+                    {t("app.label.switchRoles", {
+                      domain: domain?.name ?? "",
+                      role: role?.name ?? "",
+                    })}
+                  </DropdownItem>
+                )) || <></>}
+                <DropdownItem
+                  key='delete'
+                  className='text-danger'
+                  color='danger'
+                  onPress={onPressSignOut}
+                >
+                  {t("app.label.signOut")}
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          )}
         </NavbarItem>
       </NavbarContent>
-
-      <NavbarMenu>
-        {searchInput}
-        <div className='mx-4 mt-2 flex flex-col gap-2'>
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
-                }
-                href='#'
-                size='lg'
-              >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
-        </div>
-      </NavbarMenu>
-
       <SwitchRolesModal
         user={user}
         isOpen={isOpenSwitchRoles}

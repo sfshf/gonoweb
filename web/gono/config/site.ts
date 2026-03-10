@@ -5,20 +5,6 @@ export const siteConfig = {
   name: "Gono",
   description:
     "RBAC-with-Domains management website implemented by Next.js + HeroUI.",
-  navMenuItems: [
-    {
-      label: "Profile",
-      href: "/profile",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Logout",
-      href: "/logout",
-    },
-  ],
   links: {
     github: "https://github.com/sfshf/gonoweb",
     docs: "https://heroui.com",
